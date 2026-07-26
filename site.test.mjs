@@ -56,6 +56,22 @@ test("uses replaceable editorial placeholder image assets", () => {
   assert.match(html, /Replace with/);
 });
 
+test("uses animated South Indian bride and groom artwork", () => {
+  const animatedAssets = [
+    "placeholder-hero.svg",
+    "placeholder-mikail.svg",
+    "placeholder-dershia.svg",
+    "placeholder-gallery-1.svg",
+  ];
+
+  animatedAssets.forEach((asset) => {
+    const svg = readFileSync(new URL(`./assets/${asset}`, import.meta.url), "utf8");
+    assert.match(svg, /South Indian/i);
+    assert.match(svg, /bride|groom|couple/i);
+    assert.match(svg, /<animate|@keyframes|animation:/);
+  });
+});
+
 test("layers the landing image behind the hero text", () => {
   const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");

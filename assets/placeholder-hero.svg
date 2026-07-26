@@ -1,44 +1,87 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
-  <title id="title">Hero photo placeholder</title>
-  <desc id="desc">Warm editorial wedding room placeholder for the main couple image.</desc>
+  <title id="title">Animated South Indian bride and groom hero artwork</title>
+  <desc id="desc">Original animated South Indian wedding couple illustration with a bride in a silk saree and a groom in traditional attire.</desc>
   <defs>
     <linearGradient id="room" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#21100e"/>
-      <stop offset="0.45" stop-color="#7b4328"/>
-      <stop offset="1" stop-color="#d7a55b"/>
+      <stop offset="0" stop-color="#140b0a"/>
+      <stop offset="0.48" stop-color="#69331f"/>
+      <stop offset="1" stop-color="#d6a753"/>
     </linearGradient>
-    <radialGradient id="lamp" cx="62%" cy="32%" r="42%">
-      <stop offset="0" stop-color="#fff0b8" stop-opacity="0.9"/>
-      <stop offset="0.42" stop-color="#d8af5b" stop-opacity="0.38"/>
+    <radialGradient id="lamp" cx="56%" cy="28%" r="48%">
+      <stop offset="0" stop-color="#fff2b8" stop-opacity="0.95"/>
+      <stop offset="0.46" stop-color="#d8af5b" stop-opacity="0.34"/>
       <stop offset="1" stop-color="#161411" stop-opacity="0"/>
     </radialGradient>
-    <filter id="soft">
-      <feGaussianBlur stdDeviation="10"/>
-    </filter>
-    <pattern id="books" width="160" height="120" patternUnits="userSpaceOnUse">
-      <rect width="160" height="120" fill="none"/>
-      <rect x="8" y="10" width="22" height="94" fill="#f7efe1" opacity="0.24"/>
-      <rect x="38" y="18" width="18" height="86" fill="#d8af5b" opacity="0.34"/>
-      <rect x="66" y="8" width="28" height="98" fill="#7f1d34" opacity="0.34"/>
-      <rect x="106" y="22" width="16" height="82" fill="#fff9ed" opacity="0.22"/>
-      <rect x="132" y="14" width="18" height="90" fill="#193f35" opacity="0.4"/>
+    <pattern id="mandapPattern" width="150" height="120" patternUnits="userSpaceOnUse">
+      <rect width="150" height="120" fill="none"/>
+      <rect x="12" y="14" width="20" height="90" fill="#fff9ed" opacity="0.18"/>
+      <rect x="48" y="8" width="26" height="96" fill="#d8af5b" opacity="0.22"/>
+      <rect x="92" y="18" width="20" height="86" fill="#193f35" opacity="0.24"/>
+      <rect x="126" y="10" width="18" height="94" fill="#7f1d34" opacity="0.26"/>
     </pattern>
+    <style>
+      @keyframes heroDrift {
+        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(-18px, -12px, 0) scale(1.025); }
+      }
+      @keyframes coupleFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-18px); }
+      }
+      @keyframes jewelGlow {
+        0%, 100% { opacity: 0.46; }
+        50% { opacity: 1; }
+      }
+      @keyframes garlandSway {
+        0%, 100% { transform: rotate(-1deg); }
+        50% { transform: rotate(2deg); }
+      }
+      .hero-scene { animation: heroDrift 18s ease-in-out infinite; transform-origin: 50% 50%; }
+      .couple { animation: coupleFloat 7s ease-in-out infinite; transform-origin: 50% 70%; }
+      .glow-dot { animation: jewelGlow 2.6s ease-in-out infinite; }
+      .garland { animation: garlandSway 5.5s ease-in-out infinite; transform-origin: 50% 0%; }
+    </style>
   </defs>
   <rect width="1600" height="1000" fill="url(#room)"/>
-  <rect x="860" width="740" height="740" fill="url(#books)" opacity="0.72"/>
-  <rect y="650" width="1600" height="350" fill="#1b1110" opacity="0.72"/>
-  <ellipse cx="760" cy="980" rx="760" ry="250" fill="#090706" opacity="0.62"/>
-  <circle cx="1000" cy="320" r="470" fill="url(#lamp)"/>
-  <path d="M110 580c110-86 286-110 418-58 104 41 152 139 76 204-86 74-252 76-396 40-118-30-206-104-98-186Z" fill="#d8af5b" opacity="0.35"/>
-  <path d="M160 590c70-58 232-71 330-35 81 30 111 94 55 141-62 52-196 58-306 29-90-24-152-75-79-135Z" fill="#2b1814" opacity="0.78"/>
-  <g transform="translate(700 448)">
-    <ellipse cx="120" cy="112" rx="96" ry="154" fill="#fff9ed" opacity="0.88"/>
-    <ellipse cx="245" cy="104" rx="90" ry="146" fill="#f7efe1" opacity="0.86"/>
-    <circle cx="126" cy="20" r="42" fill="#4b241a"/>
-    <circle cx="244" cy="8" r="38" fill="#23120f"/>
-    <path d="M78 88c-72 64-103 210-74 308h434c18-105-18-246-104-306-44 54-202 57-256-2Z" fill="#fff9ed" opacity="0.82"/>
-    <path d="M172 84c58 54 150 49 201-10 80 77 107 205 86 315H222c42-104 24-222-50-305Z" fill="#7f1d34" opacity="0.52"/>
+  <g class="hero-scene">
+    <rect x="820" width="780" height="760" fill="url(#mandapPattern)" opacity="0.75"/>
+    <rect y="650" width="1600" height="350" fill="#120c0a" opacity="0.78"/>
+    <ellipse cx="760" cy="982" rx="780" ry="260" fill="#090706" opacity="0.66"/>
+    <circle cx="930" cy="290" r="520" fill="url(#lamp)"/>
+    <path d="M90 594c118-94 318-116 462-54 110 47 154 148 68 214-98 75-284 73-430 27-118-37-207-112-100-187Z" fill="#d8af5b" opacity="0.24"/>
+    <path d="M136 594c84-66 254-76 360-36 85 32 112 96 50 144-70 54-214 60-326 28-92-27-158-78-84-136Z" fill="#1b1110" opacity="0.86"/>
+    <g class="garland" fill="none" stroke-linecap="round">
+      <path d="M450 138c228 152 520 152 744 0" stroke="#d8af5b" stroke-width="20" opacity="0.86"/>
+      <path d="M488 174c198 106 438 106 670 0" stroke="#fff9ed" stroke-width="10" opacity="0.7"/>
+      <g fill="#fff9ed" stroke="none">
+        <circle cx="530" cy="184" r="16"/><circle cx="650" cy="218" r="16"/><circle cx="802" cy="230" r="18"/>
+        <circle cx="958" cy="218" r="16"/><circle cx="1080" cy="184" r="16"/>
+      </g>
+    </g>
+    <g class="couple" transform="translate(560 330)">
+      <g aria-label="South Indian bride">
+        <path d="M236 110c-96 26-154 110-150 245 4 128 74 214 170 214s166-86 170-214c4-135-54-219-150-245-12-3-28-3-40 0Z" fill="#171411"/>
+        <circle cx="256" cy="205" r="74" fill="#c78252"/>
+        <path d="M168 250c28-106 136-146 218-58-2-80-52-138-128-138-84 0-132 70-90 196Z" fill="#171411"/>
+        <path d="M72 760c26-236 94-366 184-366s158 130 184 366Z" fill="#8f1432"/>
+        <path d="M106 760c36-174 88-266 150-266s114 92 150 266Z" fill="#d8af5b"/>
+        <path d="M132 760c38-120 78-180 124-180s86 60 124 180Z" fill="#fff0b8" opacity="0.9"/>
+        <path d="M116 434c74 82 204 82 280 0" stroke="#fff9ed" stroke-width="18" fill="none" opacity="0.82"/>
+        <circle class="glow-dot" cx="256" cy="142" r="12" fill="#fff9ed"/>
+        <circle class="glow-dot" cx="202" cy="238" r="8" fill="#d8af5b"/>
+        <circle class="glow-dot" cx="310" cy="238" r="8" fill="#d8af5b"/>
+      </g>
+      <g aria-label="South Indian groom" transform="translate(300 12)">
+        <path d="M122 112c96-74 218-74 314 0 46 74 52 192 28 296-28 122-106 204-186 204s-158-82-186-204c-24-104-18-222 30-296Z" fill="#171411"/>
+        <circle cx="278" cy="238" r="76" fill="#b9744b"/>
+        <path d="M160 222c48-126 190-156 278-46-18-88-78-142-160-142-86 0-142 58-118 188Z" fill="#171411"/>
+        <path d="M80 760c26-208 104-326 198-326s172 118 198 326Z" fill="#fff9ed" opacity="0.92"/>
+        <path d="M138 760l62-294h156l62 294Z" fill="#193f35"/>
+        <path d="M214 470l64 122 64-122" stroke="#d8af5b" stroke-width="20" fill="none" stroke-linecap="round"/>
+        <path d="M154 94c60-70 188-70 248 0v64H154Z" fill="#fff9ed"/>
+        <path d="M178 88h200" stroke="#d8af5b" stroke-width="18" stroke-linecap="round"/>
+      </g>
+    </g>
+    <path d="M76 834c154-94 348-120 560-80m534-592c116 34 218 92 304 174m-72 428c96 10 170 36 224 78" stroke="#eaff45" stroke-width="5" stroke-linecap="round" opacity="0.48" fill="none"/>
   </g>
-  <path d="M0 0h1600v1000H0z" fill="#000" opacity="0.18"/>
-  <path d="M76 830c148-90 323-116 524-80m402-610c116 34 214 91 294 172m-48 432c110 8 206 41 286 100" stroke="#eaff45" stroke-width="4" stroke-linecap="round" opacity="0.42" fill="none"/>
 </svg>

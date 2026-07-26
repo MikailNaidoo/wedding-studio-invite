@@ -1,11 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 980" role="img" aria-labelledby="title desc">
-  <title id="title">Couple moment gallery placeholder</title>
-  <desc id="desc">Romantic couple moment placeholder.</desc>
-  <rect width="800" height="980" fill="#21100e"/>
-  <circle cx="400" cy="346" r="300" fill="#d8af5b" opacity="0.48"/>
-  <path d="M206 702c40-186 130-292 238-292s198 106 238 292v278H206Z" fill="#fff9ed" opacity="0.78"/>
-  <circle cx="326" cy="330" r="72" fill="#d8af5b"/>
-  <circle cx="474" cy="330" r="72" fill="#d8af5b"/>
-  <path d="M244 266c64-92 172-104 236-24" stroke="#193f35" stroke-width="48" fill="none" stroke-linecap="round"/>
-  <path d="M138 170c140 36 266 102 378 198" stroke="#eaff45" stroke-width="7" opacity="0.44" fill="none"/>
+  <title id="title">Animated South Indian couple gallery placeholder</title>
+  <desc id="desc">Original animated South Indian bride and groom couple moment for the wedding gallery.</desc>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="32%" r="70%">
+      <stop offset="0" stop-color="#d8af5b"/>
+      <stop offset="0.58" stop-color="#7f1d34"/>
+      <stop offset="1" stop-color="#21100e"/>
+    </radialGradient>
+    <style>
+      @keyframes couplePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.025); } }
+      @keyframes starPulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+      .couple { animation: couplePulse 7s ease-in-out infinite; transform-origin: 50% 72%; }
+      .star { animation: starPulse 2.2s ease-in-out infinite; }
+    </style>
+  </defs>
+  <rect width="800" height="980" fill="url(#glow)"/>
+  <path d="M0 700c190-88 350-108 800-36v316H0Z" fill="#140b0a" opacity="0.78"/>
+  <g class="couple">
+    <g aria-label="South Indian bride">
+      <circle cx="334" cy="354" r="70" fill="#c78252"/>
+      <path d="M226 424c-18-164 46-268 108-268s126 104 108 268c-36-70-180-70-216 0Z" fill="#171411"/>
+      <path d="M142 980c22-238 94-376 192-376s170 138 192 376Z" fill="#8f1432"/>
+      <path d="M204 980c34-156 76-232 130-232s96 76 130 232Z" fill="#d8af5b"/>
+      <circle class="star" cx="334" cy="272" r="10" fill="#fff9ed"/>
+    </g>
+    <g aria-label="South Indian groom">
+      <circle cx="492" cy="348" r="70" fill="#b9744b"/>
+      <path d="M394 328c52-126 166-138 230-32-16-96-66-154-132-154-72 0-116 66-98 186Z" fill="#171411"/>
+      <path d="M324 980c22-226 88-360 168-360s146 134 168 360Z" fill="#fff9ed"/>
+      <path d="M410 980l42-280h82l42 280Z" fill="#193f35"/>
+      <path d="M410 158c50-64 118-64 168 0v62H410Z" fill="#fff9ed"/>
+      <path d="M428 148h132" stroke="#d8af5b" stroke-width="14" stroke-linecap="round"/>
+    </g>
+  </g>
+  <path d="M96 164c152 44 274 112 396 210" stroke="#eaff45" stroke-width="7" opacity="0.5" fill="none"/>
+  <path class="star" d="M610 174l18 36 38 14-38 14-18 36-18-36-38-14 38-14Z" fill="#eaff45" opacity="0.72"/>
 </svg>
