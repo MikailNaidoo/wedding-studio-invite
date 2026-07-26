@@ -12,9 +12,12 @@ test("flags bot-like RSVP submissions", () => {
 test("includes required wedding content and editorial hooks", () => {
   const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+  const heroTitle = html.match(/<h1 id="hero-title"[\s\S]*?<\/h1>/)?.[0] || "";
+  const heroTitleText = heroTitle.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
   assert.match(html, /Mikail Naidoo/);
   assert.match(html, /Dershia Nadesan/);
+  assert.equal(heroTitleText, "Save the date");
   assert.match(html, /29 August 2027/);
   assert.match(html, /The Bell Inn/);
   assert.match(html, /208 Kenneth Kaunda Road/);
