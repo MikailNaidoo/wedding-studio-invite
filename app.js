@@ -7,8 +7,11 @@ const scrollScenes = [...document.querySelectorAll("[data-scroll-scene]")];
 const scrollLayers = [...document.querySelectorAll("[data-scroll-layer]")];
 const startedAt = Date.now();
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const heroSlides = [...document.querySelectorAll("[data-hero-slide]")];
+const specialCardLabel = document.querySelector("#special-card-label");
 let ticking = false;
 let scrollTimer;
+let activeHeroSlide = 0;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -52,6 +55,29 @@ const requestScrollUpdate = () => {
   ticking = true;
   requestAnimationFrame(updateScrollMotion);
 };
+
+const showHeroSlide = (index) => {
+  if (heroSlides.length === 0) return;
+  activeHeroSlide = index % heroSlides.length;
+
+  heroSlides.forEach((slide, slideIndex) => {
+    const isActive = slideIndex === activeHeroSlide;
+    slide.classList.toggle("is-active", isActive);
+    slide.setAttribute("aria-hidden", isActive ? "false" : "true");
+  });
+
+  if (specialCardLabel) {
+    specialCardLabel.textContent = heroSlides[activeHeroSlide].dataset.slideLabel || "Gallery placeholders";
+  }
+};
+
+showHeroSlide(0);
+
+if (heroSlides.length > 1 && !reducedMotion) {
+  window.setInterval(() => {
+    showHeroSlide(activeHeroSlide + 1);
+  }, 5200);
+}
 
 updateScrollMotion();
 window.addEventListener("scroll", requestScrollUpdate, { passive: true });

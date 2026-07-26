@@ -24,25 +24,31 @@
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title" data-scroll-scene>
-        <figure
-          class="hero-media hero-background photo-placeholder"
+        <div
+          class="hero-slideshow"
+          aria-hidden="true"
           data-scroll-layer
-          data-scroll-speed="-170"
-          data-scroll-scale="0.12"
+          data-scroll-speed="-42"
+          data-scroll-scale="0.03"
         >
-          <img
-            src="./assets/placeholder-hero.svg"
-            alt="Editorial placeholder for Mikail and Dershia's hero wedding photo"
-          />
-        </figure>
+          <figure class="hero-slide hero-slide-couple is-active" data-hero-slide data-slide-label="Blessed beginning">
+            <img src="./assets/wedding-hero.png" alt="" />
+          </figure>
+          <figure class="hero-slide" data-hero-slide data-slide-label="Mandap vows" aria-hidden="true">
+            <img src="./assets/wedding-mandap.png" alt="" />
+          </figure>
+          <figure class="hero-slide" data-hero-slide data-slide-label="Family celebration" aria-hidden="true">
+            <img src="./assets/gallery-celebration.png" alt="" />
+          </figure>
+        </div>
         <div class="hero-overlay">
           <p class="eyebrow reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="55">
             Wedding invitation
           </p>
-          <h1 id="hero-title" data-scroll-layer data-scroll-speed="140" data-scroll-rotate="-7">
-            <span data-scroll-layer data-scroll-speed="-34">Save</span>
-            <strong data-scroll-layer data-scroll-speed="58">the</strong>
-            <em data-scroll-layer data-scroll-speed="96">date</em>
+          <h1 id="hero-title" data-scroll-layer data-scroll-speed="52">
+            <span data-scroll-layer data-scroll-speed="-12">Save</span>
+            <strong data-scroll-layer data-scroll-speed="18">the</strong>
+            <em data-scroll-layer data-scroll-speed="28">date</em>
           </h1>
           <p class="hero-names reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="78">
             Mikail Naidoo & Dershia Nadesan
@@ -55,26 +61,29 @@
         <a
           class="special-card"
           href="#gallery"
-          aria-label="View gallery placeholders"
+          aria-label="View wedding gallery"
           data-scroll-layer
-          data-scroll-speed="-120"
-          data-scroll-rotate="8"
+          data-scroll-speed="-36"
           data-reveal
         >
           <figure class="photo-placeholder photo-frame special-card-photo" aria-hidden="true">
-            <img src="./assets/placeholder-special.svg" alt="" />
+            <img src="./assets/wedding-card-detail.png" alt="" />
           </figure>
           <span>Special Thanks</span>
-          <strong>Gallery placeholders</strong>
+          <strong id="special-card-label">Blessed beginning</strong>
+          <i class="special-arrow" aria-hidden="true">-&gt;</i>
         </a>
       </section>
 
       <section
         id="invitation"
-        class="section invitation-section"
+        class="section invitation-section lime-editorial-section"
         aria-labelledby="invitation-title"
         data-scroll-scene
       >
+        <span class="editorial-watermark" aria-hidden="true">M&D</span>
+        <span class="kolam-line kolam-line-one" aria-hidden="true"></span>
+        <span class="kolam-line kolam-line-two" aria-hidden="true"></span>
         <div class="section-inner invitation-grid">
           <p class="vertical-title" data-scroll-layer data-scroll-speed="-90">Invitation</p>
           <div>
@@ -97,31 +106,31 @@
             <article class="profile-card reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="-38">
               <figure class="photo-placeholder photo-frame profile-photo" data-scroll-layer data-scroll-speed="-62">
                 <img
-                  src="./assets/placeholder-mikail.svg"
-                  alt="Portrait placeholder for Mikail Naidoo"
+                  src="./assets/mikail-portrait.png"
+                  alt="South Indian wedding artwork portrait of Mikail Naidoo in a grey double-breasted suit with a tie, mustache, and goatee"
                 />
-                <figcaption>Replace with Mikail portrait</figcaption>
+                <figcaption>Mikail Naidoo</figcaption>
               </figure>
               <p class="profile-number">01</p>
               <h3>Mikail Naidoo</h3>
               <p>
-                Groom profile placeholder. Add a short personal note, favourite
-                memory, or a line about the journey to this day.
+                Mikail steps into the day with warmth, gratitude, and the joy of
+                welcoming every loved one into the celebration.
               </p>
             </article>
             <article class="profile-card reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="46">
               <figure class="photo-placeholder photo-frame profile-photo profile-photo-bride" data-scroll-layer data-scroll-speed="-78">
                 <img
-                  src="./assets/placeholder-dershia.svg"
-                  alt="Portrait placeholder for Dershia Nadesan"
+                  src="./assets/dershia-portrait.png"
+                  alt="South Indian wedding artwork portrait of Dershia Nadesan in cream and gold bridal attire"
                 />
-                <figcaption>Replace with Dershia portrait</figcaption>
+                <figcaption>Dershia Nadesan</figcaption>
               </figure>
               <p class="profile-number">02</p>
               <h3>Dershia Nadesan</h3>
               <p>
-                Bride profile placeholder. Add a warm biography, a favourite
-                detail, or a message for family and friends.
+                Dershia brings grace, laughter, and a luminous heart to a
+                celebration surrounded by family, blessings, and love.
               </p>
             </article>
           </div>
@@ -139,10 +148,10 @@
             </p>
             <figure class="photo-placeholder photo-frame ceremony-photo reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="-74">
               <img
-                src="./assets/placeholder-ceremony.svg"
-                alt="Wide placeholder for a South Indian wedding ceremony detail"
+                src="./assets/wedding-mandap.png"
+                alt="Ornate South Indian wedding mandap with brass lamps and flower garlands"
               />
-              <figcaption>Replace with ceremony detail</figcaption>
+              <figcaption>The ceremony mandap</figcaption>
             </figure>
           </div>
           <div class="schedule-list" aria-label="Wedding schedule">
@@ -170,7 +179,8 @@
         </div>
       </section>
 
-      <section id="place" class="section place-section" aria-labelledby="place-title" data-scroll-scene>
+      <section id="place" class="section place-section dark-place-section" aria-labelledby="place-title" data-scroll-scene>
+        <span class="editorial-watermark place-watermark" aria-hidden="true">Place</span>
         <div class="section-inner place-grid">
           <div data-reveal class="reveal-stagger">
             <p class="eyebrow">Place</p>
@@ -183,6 +193,7 @@
               rel="noreferrer"
             >
               Open access information
+              <span class="venue-link-icon" aria-hidden="true">-&gt;</span>
             </a>
           </div>
           <div class="map-panel reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="-54">
@@ -244,28 +255,28 @@
       <section id="gallery" class="section gallery-section" aria-labelledby="gallery-title" data-scroll-scene>
         <div class="section-inner">
           <p class="eyebrow reveal-stagger" data-reveal>Special Thanks</p>
-          <h2 id="gallery-title" class="reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="44">Image placeholders for the moments still to come.</h2>
+          <h2 id="gallery-title" class="reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="44">A gallery of the moments we are dreaming toward.</h2>
           <div class="gallery-grid">
             <figure class="photo-placeholder photo-frame gallery-photo reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="-92">
               <img
-                src="./assets/placeholder-gallery-1.svg"
-                alt="Gallery placeholder for a romantic couple moment"
+                src="./assets/gallery-couple.png"
+                alt="South Indian wedding artwork of Mikail and Dershia seated together, with Mikail in a grey double-breasted suit with a tie, mustache, and goatee, and Dershia in cream and gold bridal attire"
               />
-              <figcaption>Replace with couple moment</figcaption>
+              <figcaption>Our moment</figcaption>
             </figure>
             <figure class="photo-placeholder photo-frame gallery-photo reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="74">
               <img
-                src="./assets/placeholder-gallery-2.svg"
-                alt="Gallery placeholder for wedding details"
+                src="./assets/gallery-details.png"
+                alt="South Indian wedding ritual details with brass lamp, flowers, coconut, and jewellery"
               />
-              <figcaption>Replace with wedding details</figcaption>
+              <figcaption>Ritual details</figcaption>
             </figure>
             <figure class="photo-placeholder photo-frame gallery-photo reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="-44">
               <img
-                src="./assets/placeholder-gallery-3.svg"
-                alt="Gallery placeholder for family celebration"
+                src="./assets/gallery-celebration.png"
+                alt="South Indian wedding celebration setting with flowers, lamps, and sweets"
               />
-              <figcaption>Replace with celebration photo</figcaption>
+              <figcaption>Celebration glow</figcaption>
             </figure>
           </div>
           <p class="closing-note reveal-stagger" data-reveal data-scroll-layer data-scroll-speed="38">
