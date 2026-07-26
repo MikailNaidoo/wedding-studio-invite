@@ -1,0 +1,11 @@
+{
+  "name": "wedding-studio-invite",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 4180",
+    "dev": "python3 -m http.server 4180",
+    "test": "node --test site.test.mjs"
+  }
+}
