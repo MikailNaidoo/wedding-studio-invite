@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" role="img" aria-labelledby="title desc">
+  <title id="title">Mikail portrait placeholder</title>
+  <desc id="desc">Editorial groom portrait placeholder.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#193f35"/>
+      <stop offset="0.55" stop-color="#7f1d34"/>
+      <stop offset="1" stop-color="#d8af5b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1100" fill="url(#bg)"/>
+  <circle cx="240" cy="158" r="210" fill="#fff9ed" opacity="0.16"/>
+  <path d="M500 210c90 80 124 218 92 366-22 99-92 168-186 168s-162-69-184-168c-32-148 2-286 92-366 54-48 132-48 186 0Z" fill="#d8af5b" opacity="0.88"/>
+  <path d="M255 338c40-146 240-198 330-48-22-120-98-194-194-194-88 0-148 66-136 242Z" fill="#171411"/>
+  <path d="M186 870c26-146 130-230 220-230s194 84 220 230v230H186Z" fill="#fff9ed" opacity="0.9"/>
+  <path d="M288 760h236l74 340H214Z" fill="#193f35" opacity="0.96"/>
+  <path d="M364 724l42 106 44-106" stroke="#d8af5b" stroke-width="18" fill="none"/>
+  <path d="M92 918c142-76 266-110 424-96" stroke="#eaff45" stroke-width="6" opacity="0.44" fill="none"/>
+</svg>

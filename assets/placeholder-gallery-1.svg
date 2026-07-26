@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 980" role="img" aria-labelledby="title desc">
+  <title id="title">Couple moment gallery placeholder</title>
+  <desc id="desc">Romantic couple moment placeholder.</desc>
+  <rect width="800" height="980" fill="#21100e"/>
+  <circle cx="400" cy="346" r="300" fill="#d8af5b" opacity="0.48"/>
+  <path d="M206 702c40-186 130-292 238-292s198 106 238 292v278H206Z" fill="#fff9ed" opacity="0.78"/>
+  <circle cx="326" cy="330" r="72" fill="#d8af5b"/>
+  <circle cx="474" cy="330" r="72" fill="#d8af5b"/>
+  <path d="M244 266c64-92 172-104 236-24" stroke="#193f35" stroke-width="48" fill="none" stroke-linecap="round"/>
+  <path d="M138 170c140 36 266 102 378 198" stroke="#eaff45" stroke-width="7" opacity="0.44" fill="none"/>
+</svg>

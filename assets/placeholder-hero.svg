@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Hero photo placeholder</title>
+  <desc id="desc">Warm editorial wedding room placeholder for the main couple image.</desc>
+  <defs>
+    <linearGradient id="room" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#21100e"/>
+      <stop offset="0.45" stop-color="#7b4328"/>
+      <stop offset="1" stop-color="#d7a55b"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="62%" cy="32%" r="42%">
+      <stop offset="0" stop-color="#fff0b8" stop-opacity="0.9"/>
+      <stop offset="0.42" stop-color="#d8af5b" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#161411" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <pattern id="books" width="160" height="120" patternUnits="userSpaceOnUse">
+      <rect width="160" height="120" fill="none"/>
+      <rect x="8" y="10" width="22" height="94" fill="#f7efe1" opacity="0.24"/>
+      <rect x="38" y="18" width="18" height="86" fill="#d8af5b" opacity="0.34"/>
+      <rect x="66" y="8" width="28" height="98" fill="#7f1d34" opacity="0.34"/>
+      <rect x="106" y="22" width="16" height="82" fill="#fff9ed" opacity="0.22"/>
+      <rect x="132" y="14" width="18" height="90" fill="#193f35" opacity="0.4"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#room)"/>
+  <rect x="860" width="740" height="740" fill="url(#books)" opacity="0.72"/>
+  <rect y="650" width="1600" height="350" fill="#1b1110" opacity="0.72"/>
+  <ellipse cx="760" cy="980" rx="760" ry="250" fill="#090706" opacity="0.62"/>
+  <circle cx="1000" cy="320" r="470" fill="url(#lamp)"/>
+  <path d="M110 580c110-86 286-110 418-58 104 41 152 139 76 204-86 74-252 76-396 40-118-30-206-104-98-186Z" fill="#d8af5b" opacity="0.35"/>
+  <path d="M160 590c70-58 232-71 330-35 81 30 111 94 55 141-62 52-196 58-306 29-90-24-152-75-79-135Z" fill="#2b1814" opacity="0.78"/>
+  <g transform="translate(700 448)">
+    <ellipse cx="120" cy="112" rx="96" ry="154" fill="#fff9ed" opacity="0.88"/>
+    <ellipse cx="245" cy="104" rx="90" ry="146" fill="#f7efe1" opacity="0.86"/>
+    <circle cx="126" cy="20" r="42" fill="#4b241a"/>
+    <circle cx="244" cy="8" r="38" fill="#23120f"/>
+    <path d="M78 88c-72 64-103 210-74 308h434c18-105-18-246-104-306-44 54-202 57-256-2Z" fill="#fff9ed" opacity="0.82"/>
+    <path d="M172 84c58 54 150 49 201-10 80 77 107 205 86 315H222c42-104 24-222-50-305Z" fill="#7f1d34" opacity="0.52"/>
+  </g>
+  <path d="M0 0h1600v1000H0z" fill="#000" opacity="0.18"/>
+  <path d="M76 830c148-90 323-116 524-80m402-610c116 34 214 91 294 172m-48 432c110 8 206 41 286 100" stroke="#eaff45" stroke-width="4" stroke-linecap="round" opacity="0.42" fill="none"/>
+</svg>

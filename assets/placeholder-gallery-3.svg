@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 980" role="img" aria-labelledby="title desc">
+  <title id="title">Celebration gallery placeholder</title>
+  <desc id="desc">Family celebration placeholder with warm lights.</desc>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="18%" r="70%">
+      <stop offset="0" stop-color="#fff9ed"/>
+      <stop offset="0.45" stop-color="#d8af5b"/>
+      <stop offset="1" stop-color="#7f1d34"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="980" fill="url(#glow)"/>
+  <rect y="520" width="800" height="460" fill="#171411" opacity="0.86"/>
+  <g fill="#fff9ed" opacity="0.86">
+    <circle cx="170" cy="610" r="50"/>
+    <circle cx="302" cy="584" r="54"/>
+    <circle cx="438" cy="594" r="54"/>
+    <circle cx="596" cy="610" r="50"/>
+  </g>
+  <g fill="#193f35">
+    <path d="M92 980c16-176 70-264 154-264s138 88 154 264Z"/>
+    <path d="M228 980c18-198 80-294 174-294s156 96 174 294Z"/>
+    <path d="M400 980c16-176 70-264 154-264s138 88 154 264Z"/>
+  </g>
+  <path d="M114 196c128 44 230 44 306 0s164-44 264 0" stroke="#eaff45" stroke-width="8" opacity="0.52" fill="none"/>
+  <circle cx="166" cy="196" r="16" fill="#fff9ed"/>
+  <circle cx="306" cy="222" r="16" fill="#fff9ed"/>
+  <circle cx="460" cy="202" r="16" fill="#fff9ed"/>
+  <circle cx="628" cy="216" r="16" fill="#fff9ed"/>
+</svg>

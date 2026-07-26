@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 980" role="img" aria-labelledby="title desc">
+  <title id="title">Wedding detail gallery placeholder</title>
+  <desc id="desc">Wedding detail placeholder with garland and gold accents.</desc>
+  <rect width="800" height="980" fill="#f7efe1"/>
+  <rect x="112" y="120" width="576" height="740" fill="#193f35"/>
+  <path d="M206 188c122 84 264 84 388 0" stroke="#d8af5b" stroke-width="26" fill="none" stroke-linecap="round"/>
+  <g fill="#fff9ed">
+    <circle cx="244" cy="238" r="26"/>
+    <circle cx="314" cy="270" r="26"/>
+    <circle cx="400" cy="282" r="26"/>
+    <circle cx="486" cy="270" r="26"/>
+    <circle cx="556" cy="238" r="26"/>
+  </g>
+  <path d="M252 692h296L508 416H292Z" fill="#d8af5b"/>
+  <path d="M312 468h176M300 536h200M288 604h224" stroke="#7f1d34" stroke-width="14" opacity="0.55"/>
+  <path d="M96 806c172-96 340-124 504-82" stroke="#eaff45" stroke-width="7" opacity="0.48" fill="none"/>
+</svg>

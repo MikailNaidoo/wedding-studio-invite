@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { isLikelySpamSubmission } from "./rsvpProtection.js";
 
 test("flags bot-like RSVP submissions", () => {
@@ -29,4 +29,26 @@ test("includes required wedding content and editorial hooks", () => {
   assert.match(css, /\.reveal-stagger/);
   assert.match(css, /\.is-scrolling/);
   assert.match(readFileSync(new URL("./app.js", import.meta.url), "utf8"), /requestAnimationFrame/);
+});
+
+test("uses replaceable editorial placeholder image assets", () => {
+  const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  const expectedAssets = [
+    "placeholder-hero.svg",
+    "placeholder-special.svg",
+    "placeholder-mikail.svg",
+    "placeholder-dershia.svg",
+    "placeholder-ceremony.svg",
+    "placeholder-gallery-1.svg",
+    "placeholder-gallery-2.svg",
+    "placeholder-gallery-3.svg",
+  ];
+
+  expectedAssets.forEach((asset) => {
+    assert.equal(existsSync(new URL(`./assets/${asset}`, import.meta.url)), true);
+    assert.equal(html.includes(`src="./assets/${asset}"`), true);
+  });
+
+  assert.match(html, /photo-frame/);
+  assert.match(html, /Replace with/);
 });

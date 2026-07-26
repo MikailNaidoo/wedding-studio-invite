@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+  <title id="title">Ceremony detail placeholder</title>
+  <desc id="desc">South Indian ceremony detail placeholder with mandap and florals.</desc>
+  <defs>
+    <linearGradient id="goldwash" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff9ed"/>
+      <stop offset="0.48" stop-color="#d8af5b"/>
+      <stop offset="1" stop-color="#7f1d34"/>
+    </linearGradient>
+    <pattern id="flower" width="90" height="90" patternUnits="userSpaceOnUse">
+      <circle cx="45" cy="45" r="7" fill="#fff9ed" opacity="0.8"/>
+      <path d="M45 18c16 14 16 40 0 54-16-14-16-40 0-54Zm-27 27c14-16 40-16 54 0-14 16-40 16-54 0Z" fill="#7f1d34" opacity="0.28"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="640" fill="url(#goldwash)"/>
+  <rect width="1200" height="640" fill="url(#flower)" opacity="0.8"/>
+  <path d="M210 548V168h780v380" stroke="#193f35" stroke-width="32" fill="none"/>
+  <path d="M154 176h892" stroke="#fff9ed" stroke-width="38" stroke-linecap="round"/>
+  <path d="M210 164c84 70 190 108 318 116 156 9 306-24 462-116" stroke="#7f1d34" stroke-width="18" fill="none"/>
+  <circle cx="360" cy="214" r="54" fill="#d8af5b"/>
+  <circle cx="600" cy="248" r="70" fill="#fff9ed" opacity="0.82"/>
+  <circle cx="840" cy="214" r="54" fill="#d8af5b"/>
+  <path d="M468 526c68-74 196-74 264 0" stroke="#171411" stroke-width="18" fill="none" stroke-linecap="round"/>
+</svg>

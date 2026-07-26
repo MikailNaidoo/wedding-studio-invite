@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" role="img" aria-labelledby="title desc">
+  <title id="title">Dershia portrait placeholder</title>
+  <desc id="desc">Editorial bride portrait placeholder.</desc>
+  <defs>
+    <linearGradient id="bg" x1="1" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#7f1d34"/>
+      <stop offset="0.5" stop-color="#d8af5b"/>
+      <stop offset="1" stop-color="#193f35"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1100" fill="url(#bg)"/>
+  <circle cx="580" cy="156" r="210" fill="#fff9ed" opacity="0.18"/>
+  <path d="M404 150c146 0 246 120 210 332-20 119-96 206-210 206s-190-87-210-206c-36-212 64-332 210-332Z" fill="#d8af5b" opacity="0.88"/>
+  <path d="M196 458c-26-196 54-346 208-346s234 150 208 346c-40-98-94-146-208-146s-168 48-208 146Z" fill="#171411"/>
+  <path d="M138 1100c16-232 118-372 266-372s250 140 266 372Z" fill="#7f1d34"/>
+  <path d="M168 1100c40-152 116-244 236-244s196 92 236 244Z" fill="#f7efe1" opacity="0.9"/>
+  <path d="M250 822c74 52 232 52 306 0" stroke="#d8af5b" stroke-width="24" fill="none" stroke-linecap="round"/>
+  <path d="M126 242c108-72 230-102 366-90" stroke="#eaff45" stroke-width="6" opacity="0.46" fill="none"/>
+</svg>
