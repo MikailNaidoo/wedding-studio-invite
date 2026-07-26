@@ -52,3 +52,18 @@ test("uses replaceable editorial placeholder image assets", () => {
   assert.match(html, /photo-frame/);
   assert.match(html, /Replace with/);
 });
+
+test("layers the landing image behind the hero text", () => {
+  const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+  const heroFigure = html.match(/<figure\s+class="([^"]*hero-media[^"]*)"[\s\S]*?<\/figure>/)?.[0] || "";
+  const heroClasses = html.match(/<figure\s+class="([^"]*hero-media[^"]*)"/)?.[1] || "";
+
+  assert.equal(heroClasses.includes("hero-background"), true);
+  assert.equal(heroClasses.includes("photo-frame"), false);
+  assert.equal(heroFigure.includes("<figcaption>"), false);
+  assert.match(css, /\.hero\s+\.hero-media\s*\{[\s\S]*position:\s*absolute;/);
+  assert.match(css, /\.hero-media\s*\{[\s\S]*z-index:\s*0;/);
+  assert.match(css, /\.hero-overlay\s*\{[\s\S]*z-index:\s*2;/);
+  assert.match(css, /\.hero::after/);
+});
