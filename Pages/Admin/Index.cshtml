@@ -1,0 +1,373 @@
+@page
+@model WeddingStudioInvite.Pages.Admin.IndexModel
+@using WeddingStudioInvite.Models
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RSVP Dashboard | Mikail & Dershia</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/css/bootstrap.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/vendors/bootstrap-icons/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/vendors/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/css/app.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body class="admin-body mazer-admin-shell">
+    <div id="app">
+      <aside id="sidebar" class="active" aria-label="Admin sidebar">
+        <div class="sidebar-wrapper active">
+          <div class="sidebar-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <a class="mazer-brand" href="/Admin" aria-label="Mikail and Dershia admin">M&D</a>
+              <button class="sidebar-hide d-xl-none d-block border-0 bg-transparent" type="button" data-sidebar-toggle aria-label="Close sidebar">
+                <i class="bi bi-x bi-middle"></i>
+              </button>
+            </div>
+          </div>
+          <div class="sidebar-menu">
+            <ul class="menu">
+              <li class="sidebar-title">Wedding Admin</li>
+              <li class="sidebar-item active">
+                <a href="/Admin" class="sidebar-link">
+                  <i class="bi bi-grid-fill"></i>
+                  <span>Dashboard</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="/#rsvp" class="sidebar-link">
+                  <i class="bi bi-heart-fill"></i>
+                  <span>Invitation</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a asp-page-handler="Export" class="sidebar-link">
+                  <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                  <span>Export CSV</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <button class="sidebar-toggler btn x" type="button" data-sidebar-toggle aria-label="Toggle sidebar">
+            <i data-feather="x"></i>
+          </button>
+        </div>
+      </aside>
+
+      <main id="main">
+        <header class="mb-3">
+          <button class="burger-btn d-block d-xl-none border-0 bg-transparent" type="button" data-sidebar-toggle aria-label="Open sidebar">
+            <i class="bi bi-justify fs-3"></i>
+          </button>
+        </header>
+
+        <div class="page-heading">
+          <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+              <p class="admin-kicker">Mikail & Dershia</p>
+              <h1>RSVP Dashboard</h1>
+              <p class="text-subtitle text-muted">Track responses, guest counts, dietary notes, and admin status updates.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="btn btn-primary" data-new-rsvp-button data-bs-toggle="modal" data-bs-target="#newRsvpModal">
+                <i class="bi bi-plus-circle"></i> Create RSVP
+              </button>
+              <form method="post" asp-page="/Admin/Login" asp-page-handler="Logout">
+                <button class="btn btn-outline-secondary" type="submit">
+                  <i class="bi bi-box-arrow-right"></i> Log out
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.DatabaseStatusMessage))
+        {
+          <section class="alert alert-danger database-alert" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@Model.DatabaseStatusMessage</span>
+          </section>
+        }
+
+        <section class="section" aria-label="RSVP summary">
+          <div class="row">
+            <div class="col-6 col-lg-3 col-md-6">
+              <div class="card metric-card">
+                <div class="card-body px-3 py-4">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="stats-icon purple"><i class="bi bi-clipboard-data"></i></div>
+                    </div>
+                    <div class="col-md-8">
+                      <h6 class="text-muted font-semibold">Total submissions</h6>
+                      <h6 class="font-extrabold mb-0">@Model.Stats.TotalSubmissions</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3 col-md-6">
+              <div class="card metric-card">
+                <div class="card-body px-3 py-4">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="stats-icon green"><i class="bi bi-person-check-fill"></i></div>
+                    </div>
+                    <div class="col-md-8">
+                      <h6 class="text-muted font-semibold">People attending</h6>
+                      <h6 class="font-extrabold mb-0">@Model.Stats.PeopleAttending</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3 col-md-6">
+              <div class="card metric-card">
+                <div class="card-body px-3 py-4">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="stats-icon red"><i class="bi bi-person-x-fill"></i></div>
+                    </div>
+                    <div class="col-md-8">
+                      <h6 class="text-muted font-semibold">People not attending</h6>
+                      <h6 class="font-extrabold mb-0">@Model.Stats.PeopleNotAttending</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3 col-md-6">
+              <div class="card metric-card">
+                <div class="card-body px-3 py-4">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="stats-icon blue"><i class="bi bi-hourglass-split"></i></div>
+                    </div>
+                    <div class="col-md-8">
+                      <h6 class="text-muted font-semibold">Pending</h6>
+                      <h6 class="font-extrabold mb-0">@Model.Stats.Pending</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3 col-md-6">
+              <div class="card metric-card">
+                <div class="card-body px-3 py-4">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="stats-icon gold"><i class="bi bi-patch-check-fill"></i></div>
+                    </div>
+                    <div class="col-md-8">
+                      <h6 class="text-muted font-semibold">Confirmed</h6>
+                      <h6 class="font-extrabold mb-0">@Model.Stats.Confirmed</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-3 col-md-6">
+              <div class="card metric-card">
+                <div class="card-body px-3 py-4">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="stats-icon teal"><i class="bi bi-card-text"></i></div>
+                    </div>
+                    <div class="col-md-8">
+                      <h6 class="text-muted font-semibold">Dietary notes</h6>
+                      <h6 class="font-extrabold mb-0">@Model.Stats.DietaryNotes</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-6">
+              <div class="card insight-card">
+                <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                  <div>
+                    <h6 class="text-muted font-semibold">Last 7 days</h6>
+                    <h3 class="font-extrabold mb-0">@Model.Stats.LastSevenDays new submissions</h3>
+                  </div>
+                  <span class="badge bg-light-primary"><i class="bi bi-activity"></i> Live RSVP list</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="card guest-panel">
+            <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div>
+                <p class="admin-kicker mb-1">Guest list</p>
+                <h4 class="card-title mb-0">Manage responses</h4>
+              </div>
+              <form method="get" class="filter-form d-flex flex-wrap gap-2">
+                <input class="form-control" name="Search" value="@Model.Search" placeholder="Search by name" />
+                <select class="form-select" name="Filter" aria-label="Filter RSVP list">
+                  <option value="" selected="@(Model.Filter == "")">All</option>
+                  <option value="attending" selected="@(Model.Filter == "attending")">Attending</option>
+                  <option value="not-attending" selected="@(Model.Filter == "not-attending")">Not attending</option>
+                  <option value="pending" selected="@(Model.Filter == "pending")">Pending</option>
+                  <option value="confirmed" selected="@(Model.Filter == "confirmed")">Confirmed</option>
+                </select>
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-funnel"></i> Apply</button>
+              </form>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive guest-table-wrap">
+                <table class="guest-table table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Guest</th>
+                      <th>Attendance</th>
+                      <th>Guests</th>
+                      <th>Status</th>
+                      <th>Dietary</th>
+                      <th>Message</th>
+                      <th>Submitted</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach (var submission in Model.Submissions)
+                    {
+                      var duplicate = Model.DuplicateWarnings.ContainsKey(submission.Id);
+                      <tr data-rsvp-row data-id="@submission.Id" data-full-name="@submission.FullName" data-attending="@submission.Attending.ToString().ToLowerInvariant()" data-guest-count="@submission.GuestCount" data-status="@submission.AdminStatus" data-dietary="@submission.DietaryNotes" data-message="@submission.GuestMessage" data-admin-notes="@submission.AdminNotes" data-submitted-at="@submission.SubmittedAt.ToString("O")">
+                        <td>
+                          <div class="fw-bold">@submission.FullName</div>
+                          @if (duplicate)
+                          {
+                            <span class="badge bg-light-warning">Possible duplicate</span>
+                          }
+                        </td>
+                        <td><span class="badge @(submission.Attending ? "bg-light-success" : "bg-light-danger")">@(submission.Attending ? "Attending" : "Not attending")</span></td>
+                        <td>@submission.GuestCount</td>
+                        <td>
+                          <select class="form-select form-select-sm" name="Entry.AdminStatus" data-status-select data-id="@submission.Id" data-status-url="?handler=Status" aria-label="Update status for @submission.FullName">
+                            <option value="Pending" selected="@(submission.AdminStatus == AdminStatus.Pending)">Pending</option>
+                            <option value="Confirmed" selected="@(submission.AdminStatus == AdminStatus.Confirmed)">Confirmed</option>
+                          </select>
+                          <span class="status-message" data-status-message="@submission.Id">Saved @submission.UpdatedAt.ToLocalTime().ToString("dd MMM HH:mm")</span>
+                        </td>
+                        <td>@(string.IsNullOrWhiteSpace(submission.DietaryNotes) ? "None" : submission.DietaryNotes)</td>
+                        <td>@(string.IsNullOrWhiteSpace(submission.GuestMessage) ? "-" : submission.GuestMessage)</td>
+                        <td>@submission.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                        <td>
+                          <div class="table-actions">
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-edit-button data-bs-toggle="modal" data-bs-target="#editRsvpModal"><i class="bi bi-pencil-square"></i> Edit</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-delete-button data-bs-toggle="modal" data-bs-target="#deleteRsvpModal"><i class="bi bi-trash"></i> Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer>
+          <div class="footer clearfix mb-0 text-muted">
+            <div class="float-start">
+              <p>2027 &copy; Mikail & Dershia Wedding RSVP</p>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <div class="toast-region toast-container position-fixed bottom-0 end-0 p-3" data-toast-region data-toast-message="@Model.ToastMessage" data-toast-tone="@Model.ToastTone" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="modal fade" id="newRsvpModal" tabindex="-1" aria-labelledby="new-rsvp-title" data-new-modal>
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <section class="modal-content admin-modal">
+          <div class="modal-header">
+            <div>
+              <p class="admin-kicker">New RSVP</p>
+              <h2 class="modal-title" id="new-rsvp-title">Create guest response</h2>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" data-modal-close aria-label="Close"></button>
+          </div>
+          <form method="post" asp-page-handler="Create" class="modal-form">
+            <div class="modal-body">
+              <input type="hidden" name="Search" value="@Model.Search" />
+              <input type="hidden" name="Filter" value="@Model.Filter" />
+              <label class="form-label">Guest full name<input class="form-control" name="Entry.FullName" required /></label>
+              <div class="row g-3">
+                <div class="col-md-4"><label class="form-label">Attendance<select class="form-select" name="Entry.Attending"><option value="true">Attending</option><option value="false">Not attending</option></select></label></div>
+                <div class="col-md-4"><label class="form-label">Guest count<input class="form-control" name="Entry.GuestCount" type="number" min="0" max="12" value="1" /></label></div>
+                <div class="col-md-4"><label class="form-label">Status<select class="form-select" name="Entry.AdminStatus"><option value="Pending">Pending</option><option value="Confirmed">Confirmed</option></select></label></div>
+              </div>
+              <label class="form-label">Dietary notes<textarea class="form-control" name="Entry.DietaryNotes" rows="3"></textarea></label>
+              <label class="form-label">Guest message<textarea class="form-control" name="Entry.GuestMessage" rows="3"></textarea></label>
+              <label class="form-label">Admin notes<textarea class="form-control" name="Entry.AdminNotes" rows="3"></textarea></label>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal" data-modal-close>Cancel</button><button type="submit" class="btn btn-primary">Create RSVP</button></div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editRsvpModal" tabindex="-1" aria-labelledby="edit-rsvp-title" data-edit-modal>
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <section class="modal-content admin-modal">
+          <div class="modal-header">
+            <div>
+              <p class="admin-kicker">Edit RSVP</p>
+              <h2 class="modal-title" id="edit-rsvp-title">Update guest response</h2>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" data-modal-close aria-label="Close"></button>
+          </div>
+          <form method="post" asp-page-handler="Update" class="modal-form" data-edit-form>
+            <div class="modal-body">
+              <input type="hidden" name="Search" value="@Model.Search" />
+              <input type="hidden" name="Filter" value="@Model.Filter" />
+              <input type="hidden" name="Entry.Id" data-edit-field="id" />
+              <input type="hidden" name="Entry.SubmittedAt" data-edit-field="submittedAt" />
+              <label class="form-label">Guest full name<input class="form-control" name="Entry.FullName" data-edit-field="fullName" required /></label>
+              <div class="row g-3">
+                <div class="col-md-4"><label class="form-label">Attendance<select class="form-select" name="Entry.Attending" data-edit-field="attending"><option value="true">Attending</option><option value="false">Not attending</option></select></label></div>
+                <div class="col-md-4"><label class="form-label">Guest count<input class="form-control" name="Entry.GuestCount" type="number" min="0" max="12" data-edit-field="guestCount" /></label></div>
+                <div class="col-md-4"><label class="form-label">Status<select class="form-select" name="Entry.AdminStatus" data-edit-field="status"><option value="Pending">Pending</option><option value="Confirmed">Confirmed</option></select></label></div>
+              </div>
+              <label class="form-label">Dietary notes<textarea class="form-control" name="Entry.DietaryNotes" rows="3" data-edit-field="dietary"></textarea></label>
+              <label class="form-label">Guest message<textarea class="form-control" name="Entry.GuestMessage" rows="3" data-edit-field="message"></textarea></label>
+              <label class="form-label">Admin notes<textarea class="form-control" name="Entry.AdminNotes" rows="3" data-edit-field="adminNotes"></textarea></label>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal" data-modal-close>Cancel</button><button type="submit" class="btn btn-primary">Save changes</button></div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <div class="modal fade" id="deleteRsvpModal" tabindex="-1" aria-labelledby="delete-rsvp-title" data-delete-modal>
+      <div class="modal-dialog modal-dialog-centered">
+        <section class="modal-content admin-modal confirm-modal">
+          <div class="modal-header">
+            <div>
+              <p class="admin-kicker">Confirm delete</p>
+              <h2 class="modal-title" id="delete-rsvp-title">Are you sure?</h2>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" data-modal-close aria-label="Close"></button>
+          </div>
+          <div class="modal-body"><p>This will permanently remove <strong data-delete-name>this RSVP</strong> from the guest list.</p></div>
+          <form method="post" asp-page-handler="Delete" class="modal-form" data-delete-form>
+            <input type="hidden" name="id" data-delete-id />
+            <input type="hidden" name="Search" value="@Model.Search" />
+            <input type="hidden" name="Filter" value="@Model.Filter" />
+            <div class="modal-footer"><button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal" data-modal-close>Keep RSVP</button><button type="submit" class="btn btn-danger">Delete RSVP</button></div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <script src="/vendor/mazer/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="/vendor/mazer/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/mazer/assets/js/main.js"></script>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

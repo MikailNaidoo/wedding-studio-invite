@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "WeddingStudioInvite": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5147",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ADMIN_USERNAME": "admin",
+        "ADMIN_PASSWORD": "ChangeMeBeforeDeploying!"
+      }
+    }
+  }
+}

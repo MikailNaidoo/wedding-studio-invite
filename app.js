@@ -1,11 +1,6 @@
-import { isLikelySpamSubmission } from "./rsvpProtection.js";
-
-const form = document.querySelector("#rsvp-form");
-const status = document.querySelector("#form-status");
 const revealItems = [...document.querySelectorAll(".section, [data-reveal]")];
 const scrollScenes = [...document.querySelectorAll("[data-scroll-scene]")];
 const scrollLayers = [...document.querySelectorAll("[data-scroll-layer]")];
-const startedAt = Date.now();
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const heroSlides = [...document.querySelectorAll("[data-hero-slide]")];
 const specialCardLabel = document.querySelector("#special-card-label");
@@ -97,20 +92,4 @@ const revealObserver = new IntersectionObserver(
 revealItems.forEach((item, index) => {
   item.style.setProperty("--reveal-delay", `${Math.min(index % 5, 4) * 80}ms`);
   revealObserver.observe(item);
-});
-
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const formData = new FormData(form);
-  const elapsedMs = Date.now() - startedAt;
-  const honeypotValue = formData.get("website")?.toString() || "";
-
-  if (isLikelySpamSubmission({ honeypotValue, elapsedMs })) {
-    status.textContent = "We could not send that RSVP. Please refresh and try again.";
-    return;
-  }
-
-  const name = formData.get("name")?.toString().trim() || "guest";
-  status.textContent = `Thank you, ${name}. Your RSVP is captured in this prototype.`;
-  form.reset();
 });

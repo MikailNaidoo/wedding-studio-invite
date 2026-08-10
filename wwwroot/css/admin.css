@@ -1,0 +1,380 @@
+:root {
+  --admin-bg: #0f1220;
+  --admin-surface: #171b2e;
+  --admin-surface-strong: #1f2438;
+  --admin-ink: #f7f0e6;
+  --admin-muted: #aab3ca;
+  --wedding-gold: #c7933f;
+  --wedding-rose: #9f4d64;
+  --wedding-teal: #247c78;
+  --mazer-primary: #435ebe;
+}
+
+body.admin-body {
+  font-family: "Nunito", system-ui, sans-serif;
+  background: var(--admin-bg);
+  color: var(--admin-ink);
+}
+
+.mazer-admin-shell #main {
+  background:
+    radial-gradient(circle at top right, rgba(199, 147, 63, 0.12), transparent 32rem),
+    radial-gradient(circle at 10% 20%, rgba(67, 94, 190, 0.14), transparent 24rem),
+    var(--admin-bg);
+  min-height: 100vh;
+}
+
+.mazer-brand {
+  align-items: center;
+  background: linear-gradient(135deg, #fff9ec, #f1d093);
+  border: 1px solid rgba(199, 147, 63, 0.32);
+  border-radius: 18px;
+  box-shadow: 0 16px 38px rgba(67, 94, 190, 0.12);
+  color: #513515;
+  display: inline-flex;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  height: 56px;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  width: 82px;
+}
+
+#sidebar .sidebar-wrapper {
+  background: #111526;
+  border-right: 1px solid rgba(199, 147, 63, 0.12);
+}
+
+#sidebar .sidebar-header {
+  padding: 2rem 2rem 1rem;
+}
+
+#sidebar .menu .sidebar-title {
+  color: var(--wedding-gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+}
+
+#sidebar .sidebar-item.active > .sidebar-link {
+  background: linear-gradient(135deg, var(--mazer-primary), #5b6fd8);
+  box-shadow: 0 12px 28px rgba(67, 94, 190, 0.24);
+}
+
+#sidebar .sidebar-link {
+  border-radius: 12px;
+}
+
+#sidebar .sidebar-link i {
+  color: inherit;
+}
+
+.sidebar-note {
+  cursor: default;
+  opacity: 0.76;
+}
+
+.page-heading h1,
+.auth-title {
+  color: var(--admin-ink);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.page-heading .text-muted,
+.mazer-admin-shell .text-muted,
+.mazer-admin-shell .text-subtitle {
+  color: var(--admin-muted) !important;
+}
+
+.admin-kicker {
+  color: var(--wedding-gold);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  margin: 0 0 0.45rem;
+  text-transform: uppercase;
+}
+
+.database-alert {
+  align-items: center;
+  border: 0;
+  border-radius: 16px;
+  display: flex;
+  gap: 0.8rem;
+}
+
+.metric-card,
+.insight-card,
+.guest-panel {
+  background: var(--admin-surface);
+  border: 0;
+  border-radius: 18px;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+  color: var(--admin-ink);
+}
+
+.metric-card .card-body,
+.insight-card .card-body,
+.guest-panel .card-body {
+  color: var(--admin-ink);
+}
+
+.metric-card .stats-icon {
+  align-items: center;
+  border-radius: 16px;
+  display: flex;
+  font-size: 1.35rem;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.stats-icon.gold {
+  background: rgba(199, 147, 63, 0.16);
+  color: var(--wedding-gold);
+}
+
+.stats-icon.teal {
+  background: rgba(36, 124, 120, 0.14);
+  color: var(--wedding-teal);
+}
+
+.guest-panel .card-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.5rem;
+}
+
+.guest-panel .card-title,
+.metric-card h6,
+.insight-card h3 {
+  color: var(--admin-ink);
+}
+
+.mazer-admin-shell .form-control,
+.mazer-admin-shell .form-select {
+  background-color: #111526;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--admin-ink);
+}
+
+.mazer-admin-shell .form-control::placeholder {
+  color: #78839d;
+}
+
+.mazer-admin-shell .form-control:focus,
+.mazer-admin-shell .form-select:focus {
+  background-color: #111526;
+  border-color: rgba(199, 147, 63, 0.72);
+  box-shadow: 0 0 0 0.18rem rgba(199, 147, 63, 0.16);
+  color: var(--admin-ink);
+}
+
+.filter-form .form-control,
+.filter-form .form-select {
+  min-width: 180px;
+}
+
+.guest-table {
+  color: var(--admin-ink);
+  min-width: 1100px;
+  vertical-align: middle;
+}
+
+.guest-table thead th {
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #d6b77f;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.guest-table tbody td {
+  border-color: rgba(255, 255, 255, 0.07);
+  color: #ece4d8;
+}
+
+.guest-table.table-hover > tbody > tr:hover > * {
+  background-color: rgba(255, 255, 255, 0.04);
+  color: #fff7ee;
+}
+
+.guest-table tbody td {
+  max-width: 220px;
+}
+
+.guest-table .form-select {
+  min-width: 132px;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.status-message {
+  color: var(--admin-muted);
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 0.35rem;
+}
+
+.badge {
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.modal-backdrop {
+  background-color: #111827;
+}
+
+.admin-modal {
+  background: var(--admin-surface);
+  border: 0;
+  border-radius: 20px;
+  box-shadow: 0 28px 70px rgba(37, 48, 71, 0.2);
+  color: var(--admin-ink);
+}
+
+.admin-modal .modal-header,
+.admin-modal .modal-footer {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.admin-modal .modal-title {
+  color: var(--admin-ink);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.modal-form .form-label {
+  color: var(--admin-muted);
+  display: block;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.modal-form .form-control,
+.modal-form .form-select {
+  background-color: #111526;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--admin-ink);
+}
+
+.modal-form .form-control,
+.modal-form .form-select {
+  margin-top: 0.4rem;
+}
+
+.toast-region {
+  z-index: 1090;
+}
+
+.admin-toast {
+  background: var(--admin-surface-strong);
+  border: 0;
+  border-left: 5px solid var(--mazer-primary);
+  border-radius: 14px;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.3);
+  color: var(--admin-ink);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.admin-toast.show,
+.admin-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.admin-toast-error {
+  border-left-color: #dc3545;
+}
+
+.mazer-login #auth {
+  background: #f7f8ff;
+}
+
+.mazer-login #auth-left {
+  padding: 4rem 4.5rem;
+}
+
+.mazer-login .auth-brand {
+  margin-bottom: 2.5rem;
+}
+
+.mazer-login .auth-subtitle {
+  color: var(--admin-muted);
+  line-height: 1.6;
+}
+
+.mazer-login #auth-right {
+  background:
+    linear-gradient(135deg, rgba(67, 94, 190, 0.82), rgba(159, 77, 100, 0.62)),
+    radial-gradient(circle at 24% 24%, rgba(241, 208, 147, 0.9), transparent 28%),
+    url("/assets/wedding-card-detail.png") center / cover;
+  min-height: 100vh;
+  position: relative;
+}
+
+.auth-art-panel {
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 24px;
+  bottom: 4rem;
+  color: white;
+  left: 4rem;
+  max-width: 420px;
+  padding: 2rem;
+  position: absolute;
+}
+
+.auth-art-panel h2 {
+  color: white;
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.auth-art-panel p {
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 0;
+}
+
+.admin-error {
+  border: 0;
+  border-radius: 12px;
+}
+
+@media (max-width: 1199px) {
+  .mazer-admin-shell #sidebar.active {
+    left: 0;
+  }
+
+  .mazer-admin-shell #sidebar:not(.active) {
+    left: -300px;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-heading .btn {
+    width: 100%;
+  }
+
+  .filter-form,
+  .filter-form .form-control,
+  .filter-form .form-select,
+  .filter-form .btn {
+    width: 100%;
+  }
+
+  .mazer-login #auth-left {
+    padding: 3rem 2rem;
+  }
+}
