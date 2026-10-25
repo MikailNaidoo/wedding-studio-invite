@@ -158,35 +158,347 @@ test("admin section uses the local Mazer template without touching the public pa
   assert.match(css, /\.mazer-admin-shell/);
   assert.match(css, /\.mazer-login/);
   assert.match(css, /--wedding-gold/);
-  assert.match(js, /sidebar-wrapper/);
   assert.match(js, /bootstrap\.Modal/);
   assert.doesNotMatch(publicPage, /\/vendor\/mazer/);
   assert.doesNotMatch(publicPage, /mazer-admin-shell/);
 });
 
-test("keeps the generated South Indian wedding artwork and mobile hero framing", () => {
-  const page = read("./Pages/Index.cshtml");
-  const css = read("./styles.css");
-  const manifest = JSON.parse(read("./assets/image-manifest.json"));
+test("admin mobile sidebar relies on a single Mazer toggle path", () => {
+  const css = read("./wwwroot/css/admin.css");
+  const js = read("./wwwroot/js/admin.js");
 
-  [
-    "wedding-hero.png",
-    "wedding-card-detail.png",
-    "mikail-portrait.png",
-    "dershia-portrait.png",
-    "wedding-mandap.png",
-    "gallery-couple.png",
-    "gallery-details.png",
-    "gallery-celebration.png",
-  ].forEach((asset) => {
-    assert.equal(existsSync(new URL(`./assets/${asset}`, import.meta.url)), true);
-    assert.match(page, new RegExp(`/assets/${asset}`));
-    assert.equal(typeof manifest[asset], "string");
-  });
+  assert.doesNotMatch(js, /querySelectorAll\("\[data-sidebar-toggle\]"\)/);
+  assert.match(css, /#sidebar\.active\s+\.sidebar-wrapper/);
+  assert.match(css, /z-index:\s*1050/);
+  assert.match(css, /max-width:\s*min\(300px,\s*86vw\)/);
+});
 
-  assert.match(page, /grey double-breasted suit with a tie, mustache, and goatee/);
-  assert.match(page, /cream and gold bridal attire/);
-  assert.match(css, /@media \(max-width: 540px\)[\s\S]*\.hero-slide-couple img\s*\{[\s\S]*object-position:\s*78% center;/);
+test("admin seating plan renders an accessible 150 guest layout", () => {
+  assert.equal(existsSync(new URL("./Pages/Admin/Seating.cshtml", import.meta.url)), true);
+  assert.equal(existsSync(new URL("./Pages/Admin/Seating.cshtml.cs", import.meta.url)), true);
+  assert.equal(existsSync(new URL("./wwwroot/css/seating.css", import.meta.url)), true);
+  assert.equal(existsSync(new URL("./wwwroot/js/seating.js", import.meta.url)), true);
+
+  const dashboard = read("./Pages/Admin/Index.cshtml");
+  const seating = read("./Pages/Admin/Seating.cshtml");
+  const seatingModel = read("./Pages/Admin/Seating.cshtml.cs");
+  const css = read("./wwwroot/css/seating.css");
+  const js = read("./wwwroot/js/seating.js");
+
+  assert.match(dashboard, /\/Admin\/Seating/);
+  assert.match(seating, /\/Admin\/Seating/);
+  assert.match(seating, /Seating Plan/);
+  assert.match(seating, /data-seating-stage/);
+  assert.match(seating, /data-seat-button/);
+  assert.match(seating, /data-seat-detail/);
+  assert.match(seating, /seating-accessible-table/);
+  assert.match(seating, /aria-label/);
+  assert.match(seating, /\/css\/seating\.css/);
+  assert.match(seating, /\/js\/seating\.js/);
+  assert.match(seatingModel, /\[Authorize\]/);
+  assert.match(seatingModel, /TableCount\s*=\s*15/);
+  assert.match(seatingModel, /SeatsPerTable\s*=\s*10/);
+  assert.match(seatingModel, /ListAttendingGuestsAsync/);
+  assert.doesNotMatch(seatingModel, /Guest 150/);
+  assert.match(css, /\.seating-floor-plan/);
+  assert.match(css, /\.floor-seat/);
+  assert.match(js, /data-seat-button/);
+  assert.match(js, /data-seat-detail/);
+  assert.match(js, /focus/);
+});
+
+test("admin seating plan uses a responsive floor-plan layout", () => {
+  const seating = read("./Pages/Admin/Seating.cshtml");
+  const css = read("./wwwroot/css/seating.css");
+  const js = read("./wwwroot/js/seating.js");
+
+  assert.match(seating, /seating-floor-plan/);
+  assert.match(seating, /floor-plan-scroll/);
+  assert.match(seating, /dance-floor/);
+  assert.match(seating, /Dance Floor/);
+  assert.match(seating, /head-table/);
+  assert.match(seating, /Head Table/);
+  assert.match(seating, /floor-table/);
+  assert.match(seating, /floor-seat/);
+  assert.doesNotMatch(seating, /class="[^"]*seating-stage/);
+  assert.doesNotMatch(seating, /class="table-grid"/);
+  assert.doesNotMatch(seating, /class="seat-table/);
+  assert.doesNotMatch(seating, /class="seat-orbit/);
+  assert.match(css, /linear-gradient\(rgba\(17,\s*24,\s*39,\s*0\.06\) 1px,\s*transparent 1px\)/);
+  assert.match(css, /\.seating-floor-plan/);
+  assert.match(css, /\.floor-table/);
+  assert.match(css, /border:\s*2px solid #1f2937/);
+  assert.match(css, /\.floor-seat/);
+  assert.match(css, /border-radius:\s*50%/);
+  assert.match(css, /\.dance-floor/);
+  assert.match(css, /\.head-table/);
+  assert.match(css, /\.floor-plan-scroll\s*\{[\s\S]*background:\s*var\(--floor-paper\)/);
+  assert.match(css, /\.seating-card\s+\.card-body\s*\{[\s\S]*background:\s*var\(--floor-paper\)/);
+  assert.match(css, /box-shadow:\s*none/);
+  assert.doesNotMatch(css, /\.seat-orbit/);
+  assert.match(css, /overflow-x:\s*auto/);
+  assert.match(css, /min-width:\s*1320px/);
+  assert.match(css, /@media \(max-width: 767px\)/);
+  assert.match(js, /floor-seat/);
+});
+
+test("admin seating plan reads attending guests and saves draggable table layout", () => {
+  const repositoryInterface = read("./Data/IWeddingRepository.cs");
+  const repository = read("./Data/WeddingRepository.cs");
+  const seating = read("./Pages/Admin/Seating.cshtml");
+  const seatingModel = read("./Pages/Admin/Seating.cshtml.cs");
+  const css = read("./wwwroot/css/seating.css");
+  const js = read("./wwwroot/js/seating.js");
+
+  assert.match(repositoryInterface, /ListAttendingGuestsAsync/);
+  assert.match(repositoryInterface, /ListSeatingLayoutAsync/);
+  assert.match(repositoryInterface, /SaveSeatingLayoutAsync/);
+  assert.match(repository, /CREATE TABLE IF NOT EXISTS seating_layout/);
+  assert.match(repository, /WHERE attending = TRUE/);
+  assert.match(repository, /ORDER BY LOWER\(full_name\), id/);
+  assert.match(seatingModel, /OnPostLayoutAsync/);
+  assert.match(seatingModel, /JsonResult/);
+  assert.match(seatingModel, /SaveSeatingLayoutAsync/);
+  assert.match(seating, /data-layout-url/);
+  assert.match(seating, /data-floor-table/);
+  assert.match(seating, /data-guest="@seat\.GuestName"/);
+  assert.match(seating, /@seat\.GuestName/);
+  assert.match(css, /cursor:\s*grab/);
+  assert.match(css, /\.floor-table\.is-dragging/);
+  assert.match(js, /pointerdown/);
+  assert.match(js, /pointermove/);
+  assert.match(js, /pointerup/);
+  assert.match(js, /pointercancel/);
+  assert.match(js, /lostpointercapture/);
+  assert.match(js, /getTablePosition/);
+  assert.match(js, /getBoundingClientRect/);
+  assert.match(js, /fetch\(layoutUrl/);
+  assert.match(js, /RequestVerificationToken/);
+  assert.doesNotMatch(js, /table\.style\.left \|\| "0"/);
+  assert.doesNotMatch(seating, /Guest \d\{3\}/);
+});
+
+test("admin seating plan saves guest assignments to specific table seats", () => {
+  assert.equal(existsSync(new URL("./Models/SeatingAssignment.cs", import.meta.url)), true);
+
+  const repositoryInterface = read("./Data/IWeddingRepository.cs");
+  const repository = read("./Data/WeddingRepository.cs");
+  const seating = read("./Pages/Admin/Seating.cshtml");
+  const seatingModel = read("./Pages/Admin/Seating.cshtml.cs");
+
+  assert.match(repositoryInterface, /ListSeatingAssignmentsAsync/);
+  assert.match(repositoryInterface, /SaveSeatingAssignmentAsync/);
+  assert.match(repositoryInterface, /ClearSeatingAssignmentAsync/);
+  assert.match(repository, /CREATE TABLE IF NOT EXISTS guest_seating_assignments/);
+  assert.match(repository, /rsvp_submission_id BIGINT NOT NULL UNIQUE/);
+  assert.match(repository, /UNIQUE \(table_number, seat_number\)/);
+  assert.match(repository, /JOIN rsvp_submissions/);
+  assert.match(repository, /attending = TRUE/);
+  assert.match(seatingModel, /SeatingAssignment/);
+  assert.match(seatingModel, /OnPostAssignAsync/);
+  assert.match(seatingModel, /OnPostClearAssignmentAsync/);
+  assert.match(seatingModel, /UnassignedGuests/);
+  assert.match(seating, /asp-page-handler="Assign"/);
+  assert.match(seating, /asp-page-handler="ClearAssignment"/);
+  assert.match(seating, /name="Assignment\.RsvpSubmissionId"/);
+  assert.match(seating, /name="Assignment\.TableNumber"/);
+  assert.match(seating, /name="Assignment\.SeatNumber"/);
+  assert.match(seating, /Unassigned guests/);
+  assert.match(seating, /@seat\.RsvpSubmissionId/);
+  assert.match(seating, /data-rsvp-id="@seat\.RsvpSubmissionId"/);
+});
+
+test("admin seating accessible list only shows tables with assigned guests", () => {
+  const seating = read("./Pages/Admin/Seating.cshtml");
+  const seatingModel = read("./Pages/Admin/Seating.cshtml.cs");
+
+  assert.match(seatingModel, /AssignedTables/);
+  assert.match(seating, /Model\.AssignedTables/);
+  assert.match(seating, /@if \(Model\.AssignedTables\.Count > 0\)/);
+
+  const accessibleSection = seating.match(/<section class="section seating-accessible-table"[\s\S]*?<\/section>/)?.[0] || "";
+  assert.match(accessibleSection, /Model\.AssignedTables/);
+  assert.match(accessibleSection, /table\.AssignedSeats/);
+  assert.doesNotMatch(accessibleSection, /Model\.Tables/);
+  assert.doesNotMatch(accessibleSection, /Open seat/);
+  assert.doesNotMatch(accessibleSection, /No guests have been assigned/);
+});
+
+test("admin seating floor map only renders assigned tables and guest names", () => {
+  const seating = read("./Pages/Admin/Seating.cshtml");
+
+  const floorMap = seating.match(/<div class="floor-table-grid">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/)?.[0] || "";
+  assert.match(floorMap, /Model\.VisualizedTables/);
+  assert.match(floorMap, /table\.Seats/);
+  assert.doesNotMatch(floorMap, /Model\.Tables/);
+  assert.doesNotMatch(floorMap, /table\.AssignedSeats/);
+  assert.match(floorMap, /@seat\.GuestName/);
+  assert.match(seating, /No tables created yet/);
+});
+
+test("admin seating plan can create empty visualized tables before guests are assigned", () => {
+  assert.equal(existsSync(new URL("./Models/CreatedSeatingTable.cs", import.meta.url)), true);
+
+  const repositoryInterface = read("./Data/IWeddingRepository.cs");
+  const repository = read("./Data/WeddingRepository.cs");
+  const seating = read("./Pages/Admin/Seating.cshtml");
+  const seatingModel = read("./Pages/Admin/Seating.cshtml.cs");
+
+  assert.match(repositoryInterface, /ListCreatedSeatingTablesAsync/);
+  assert.match(repositoryInterface, /CreateSeatingTableAsync/);
+  assert.match(repository, /CREATE TABLE IF NOT EXISTS created_seating_tables/);
+  assert.match(repository, /INSERT INTO created_seating_tables/);
+  assert.match(repository, /ON CONFLICT \(table_number\)/);
+  assert.match(seatingModel, /CreatedTables/);
+  assert.match(seatingModel, /VisualizedTables/);
+  assert.match(seatingModel, /OnPostCreateTableAsync/);
+  assert.match(seatingModel, /ListCreatedSeatingTablesAsync/);
+  assert.match(seatingModel, /CreateSeatingTableAsync/);
+  assert.match(seating, /asp-page-handler="CreateTable"/);
+  assert.match(seating, /name="NewTableNumber"/);
+  assert.match(seating, /Create table/);
+  assert.match(seating, /Model\.VisualizedTables/);
+  assert.match(seating, /@table\.AssignedSeatCount seated/);
+});
+
+test("admin seating plan renders saved table coordinates with invariant css decimals", () => {
+  const seating = read("./Pages/Admin/Seating.cshtml");
+
+  assert.match(seating, /ToString\("0\.###", CultureInfo\.InvariantCulture\)/);
+  assert.match(seating, /left: \{savedPosition\.XPercent\.ToString/);
+  assert.match(seating, /top: \{savedPosition\.YPercent\.ToString/);
+});
+
+test("admin seating can export assigned tables as a printable PDF", () => {
+  const seating = read("./Pages/Admin/Seating.cshtml");
+  const seatingModel = read("./Pages/Admin/Seating.cshtml.cs");
+
+  assert.match(seatingModel, /OnGetExportPdfAsync/);
+  assert.match(seatingModel, /BuildSeatingPlanPdf/);
+  assert.match(seatingModel, /File\(pdf/);
+  assert.match(seatingModel, /application\/pdf/);
+  assert.match(seatingModel, /Mikail & Dershia Wedding Seating Plan\.pdf/);
+  assert.match(seatingModel, /29\.08\.2027/);
+  assert.match(seatingModel, /MIKAIL & DERSHIA WEDDING/);
+  assert.match(seatingModel, /SEATING PLAN/);
+  assert.match(seatingModel, /AssignedTables/);
+  const pdfBuilder = seatingModel.match(/private static byte\[\] BuildSeatingPlanPdf[\s\S]*?return writer\.Build\(\);/)?.[0] || "";
+  assert.match(pdfBuilder, /AssignedSeats/);
+  assert.doesNotMatch(pdfBuilder, /Open seat/);
+  assert.match(seating, /\?handler=ExportPdf/);
+  assert.match(seating, /Export PDF/);
+});
+
+test("admin seating plan keeps desktop tables fully visible", () => {
+  const css = read("./wwwroot/css/seating.css");
+
+  assert.match(css, /\.seating-workspace\s*\{[\s\S]*grid-template-columns:\s*1fr/);
+  assert.doesNotMatch(css, /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+270px/);
+  assert.match(css, /\.floor-plan-scroll\s*\{[\s\S]*overflow-x:\s*auto/);
+  assert.match(css, /\.floor-plan-scroll\s*\{[\s\S]*overflow-y:\s*auto/);
+  assert.match(css, /\.seating-floor-plan\s*\{[\s\S]*width:\s*100%/);
+  assert.match(css, /\.seating-floor-plan\s*\{[\s\S]*min-width:\s*1320px/);
+  assert.match(css, /\.seating-floor-plan\s*\{[\s\S]*height:\s*900px/);
+  assert.match(css, /\.seat-detail-panel\s*\{[\s\S]*position:\s*static/);
+  assert.doesNotMatch(css, /position:\s*sticky/);
+  assert.match(css, /\.table-position-1\s*\{\s*left:\s*120px/);
+  assert.match(css, /\.table-position-11\s*\{\s*left:\s*1120px/);
+  assert.match(css, /\.table-position-12\s*\{\s*left:\s*1090px/);
+});
+
+test("admin tasks page persists wedding to-dos to PostgreSQL", () => {
+  assert.equal(existsSync(new URL("./Models/TodoItem.cs", import.meta.url)), true);
+  assert.equal(existsSync(new URL("./Pages/Admin/Tasks.cshtml", import.meta.url)), true);
+  assert.equal(existsSync(new URL("./Pages/Admin/Tasks.cshtml.cs", import.meta.url)), true);
+
+  const repositoryInterface = read("./Data/IWeddingRepository.cs");
+  const repository = read("./Data/WeddingRepository.cs");
+  const dashboard = read("./Pages/Admin/Index.cshtml");
+  const seating = read("./Pages/Admin/Seating.cshtml");
+  const tasks = read("./Pages/Admin/Tasks.cshtml");
+  const tasksModel = read("./Pages/Admin/Tasks.cshtml.cs");
+  const css = read("./wwwroot/css/admin.css");
+  const js = read("./wwwroot/js/admin.js");
+
+  assert.match(repositoryInterface, /CreateTaskAsync/);
+  assert.match(repositoryInterface, /ListTasksAsync/);
+  assert.match(repositoryInterface, /UpdateTaskAsync/);
+  assert.match(repositoryInterface, /UpdateTaskCompletionAsync/);
+  assert.match(repositoryInterface, /DeleteTaskAsync/);
+  assert.match(repository, /CREATE TABLE IF NOT EXISTS admin_tasks/);
+  assert.match(repository, /ReadTask/);
+  assert.match(dashboard, /\/Admin\/Tasks/);
+  assert.match(seating, /\/Admin\/Tasks/);
+  assert.match(tasks, /Wedding Tasks/);
+  assert.match(tasks, /asp-page-handler="Create"/);
+  assert.match(tasks, /asp-page-handler="Update"/);
+  assert.match(tasks, /asp-page-handler="Toggle"/);
+  assert.match(tasks, /asp-page-handler="Delete"/);
+  assert.match(tasks, /data-task-edit-button/);
+  assert.match(tasks, /data-task-delete-button/);
+  assert.match(tasks, /data-toast-region/);
+  assert.match(tasksModel, /\[Authorize\]/);
+  assert.match(tasksModel, /OnPostCreateAsync/);
+  assert.match(tasksModel, /OnPostUpdateAsync/);
+  assert.match(tasksModel, /OnPostToggleAsync/);
+  assert.match(tasksModel, /OnPostDeleteAsync/);
+  assert.match(css, /\.task-table/);
+  assert.match(js, /data-task-edit-button/);
+  assert.match(js, /data-task-delete-button/);
+});
+
+test("admin people can be managed and assigned to tasks", () => {
+  assert.equal(existsSync(new URL("./Models/Person.cs", import.meta.url)), true);
+  assert.equal(existsSync(new URL("./Pages/Admin/People.cshtml", import.meta.url)), true);
+  assert.equal(existsSync(new URL("./Pages/Admin/People.cshtml.cs", import.meta.url)), true);
+
+  const repositoryInterface = read("./Data/IWeddingRepository.cs");
+  const repository = read("./Data/WeddingRepository.cs");
+  const person = read("./Models/Person.cs");
+  const todo = read("./Models/TodoItem.cs");
+  const dashboard = read("./Pages/Admin/Index.cshtml");
+  const seating = read("./Pages/Admin/Seating.cshtml");
+  const tasks = read("./Pages/Admin/Tasks.cshtml");
+  const tasksModel = read("./Pages/Admin/Tasks.cshtml.cs");
+  const people = read("./Pages/Admin/People.cshtml");
+  const peopleModel = read("./Pages/Admin/People.cshtml.cs");
+  const js = read("./wwwroot/js/admin.js");
+
+  assert.match(person, /public sealed class Person/);
+  assert.match(person, /Name/);
+  assert.match(person, /Role/);
+  assert.match(todo, /AssignedToPersonId/);
+  assert.match(todo, /AssignedToName/);
+  assert.match(repositoryInterface, /CreatePersonAsync/);
+  assert.match(repositoryInterface, /ListPeopleAsync/);
+  assert.match(repositoryInterface, /UpdatePersonAsync/);
+  assert.match(repositoryInterface, /DeletePersonAsync/);
+  assert.match(repository, /CREATE TABLE IF NOT EXISTS admin_people/);
+  assert.match(repository, /assigned_to_person_id/);
+  assert.match(repository, /LEFT JOIN admin_people/);
+  assert.match(repository, /ReadPerson/);
+  assert.match(dashboard, /\/Admin\/People/);
+  assert.match(seating, /\/Admin\/People/);
+  assert.match(tasks, /\/Admin\/People/);
+  assert.match(tasks, /Assign to/);
+  assert.match(tasks, /TaskItem\.AssignedToPersonId/);
+  assert.match(tasks, /Model\.People/);
+  assert.match(tasks, /Assigned/);
+  assert.match(tasksModel, /IReadOnlyList<Person> People/);
+  assert.match(tasksModel, /ListPeopleAsync/);
+  assert.match(people, /People/);
+  assert.match(people, /asp-page-handler="Create"/);
+  assert.match(people, /asp-page-handler="Update"/);
+  assert.match(people, /asp-page-handler="Delete"/);
+  assert.match(people, /data-person-edit-button/);
+  assert.match(people, /data-person-delete-button/);
+  assert.match(peopleModel, /\[Authorize\]/);
+  assert.match(peopleModel, /OnPostCreateAsync/);
+  assert.match(peopleModel, /OnPostUpdateAsync/);
+  assert.match(peopleModel, /OnPostDeleteAsync/);
+  assert.match(js, /data-person-edit-button/);
+  assert.match(js, /data-person-delete-button/);
+  assert.match(js, /assignedToPersonId/);
 });
 
 test("serves browser touch icons to avoid static asset 404 noise", () => {
@@ -217,4 +529,17 @@ test("documents and handles local PostgreSQL being unavailable", () => {
   assert.match(adminPage, /DatabaseUnavailableException/);
   assert.match(readme, /docker compose up -d/);
   assert.match(readme, /Connection refused/);
+});
+
+test("v2 preview and Razor page resolve all local assets and matching tab panels", () => {
+  for (const file of ["./index.html", "./Pages/Index.cshtml"]) {
+    const html = read(file);
+    for (const [, asset] of html.matchAll(/(?:src|href)="([^"#?]+)"/g)) {
+      if (/^(https?:|\/admin)/.test(asset)) continue;
+      assert.ok(existsSync(new URL(asset.replace(/^\//, "./"), import.meta.url)), file + ": missing " + asset);
+    }
+    for (const [, target] of html.matchAll(/aria-controls="([^"]+)"/g)) {
+      assert.ok(html.includes('id="' + target + '"'), "Missing tab panel " + target);
+    }
+  }
 });

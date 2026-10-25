@@ -1,0 +1,266 @@
+@page
+@model WeddingStudioInvite.Pages.Admin.TasksModel
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wedding Tasks | Mikail & Dershia</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/css/bootstrap.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/vendors/bootstrap-icons/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/vendors/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/css/app.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body class="admin-body mazer-admin-shell">
+    <div id="app">
+      <aside id="sidebar" class="active" aria-label="Admin sidebar">
+        <div class="sidebar-wrapper active">
+          <div class="sidebar-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <a class="mazer-brand" href="/Admin" aria-label="Mikail and Dershia admin">M&D</a>
+              <button class="sidebar-hide d-xl-none d-block border-0 bg-transparent" type="button" data-sidebar-toggle aria-label="Close sidebar">
+                <i class="bi bi-x bi-middle"></i>
+              </button>
+            </div>
+          </div>
+          <div class="sidebar-menu">
+            <ul class="menu">
+              <li class="sidebar-title">Wedding Admin</li>
+              <li class="sidebar-item">
+                <a href="/Admin" class="sidebar-link">
+                  <i class="bi bi-grid-fill"></i>
+                  <span>Dashboard</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="/Admin/Seating" class="sidebar-link">
+                  <i class="bi bi-diagram-3-fill"></i>
+                  <span>Seating Plan</span>
+                </a>
+              </li>
+              <li class="sidebar-item active">
+                <a href="/Admin/Tasks" class="sidebar-link">
+                  <i class="bi bi-check2-square"></i>
+                  <span>Tasks</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="/Admin/People" class="sidebar-link">
+                  <i class="bi bi-people-fill"></i>
+                  <span>People</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="/#rsvp" class="sidebar-link">
+                  <i class="bi bi-heart-fill"></i>
+                  <span>Invitation</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="/Admin?handler=Export" class="sidebar-link">
+                  <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                  <span>Export CSV</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <button class="sidebar-toggler btn x" type="button" data-sidebar-toggle aria-label="Toggle sidebar">
+            <i data-feather="x"></i>
+          </button>
+        </div>
+      </aside>
+
+      <main id="main">
+        <header class="mb-3">
+          <button class="burger-btn d-block d-xl-none border-0 bg-transparent" type="button" data-sidebar-toggle aria-label="Open sidebar">
+            <i class="bi bi-justify fs-3"></i>
+          </button>
+        </header>
+
+        <div class="page-heading">
+          <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+              <p class="admin-kicker">Wedding planning</p>
+              <h1>Wedding Tasks</h1>
+              <p class="text-subtitle text-muted">Keep the small planning jobs visible and saved alongside RSVP admin data.</p>
+            </div>
+            <a class="btn btn-outline-secondary" href="/Admin">
+              <i class="bi bi-arrow-left"></i> Back to dashboard
+            </a>
+          </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.DatabaseStatusMessage))
+        {
+          <section class="alert alert-danger database-alert" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@Model.DatabaseStatusMessage</span>
+          </section>
+        }
+
+        <section class="section">
+          <div class="card guest-panel task-create-card">
+            <div class="card-header">
+              <div>
+                <p class="admin-kicker mb-1">New task</p>
+                <h2 class="card-title mb-0">Add a wedding to-do</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <form method="post" asp-page-handler="Create" class="row g-3 align-items-end">
+                <div class="col-lg-4">
+                  <label class="form-label">Task title
+                    <input class="form-control" name="TaskItem.Title" maxlength="160" required placeholder="Confirm flower garlands" />
+                  </label>
+                </div>
+                <div class="col-lg-4">
+                  <label class="form-label">Notes
+                    <input class="form-control" name="TaskItem.Notes" maxlength="500" placeholder="Vendor, timing, or reminder details" />
+                  </label>
+                </div>
+                <div class="col-lg-2">
+                  <label class="form-label">Assign to
+                    <select class="form-select" name="TaskItem.AssignedToPersonId">
+                      <option value="">Unassigned</option>
+                      @foreach (var person in Model.People)
+                      {
+                        <option value="@person.Id">@person.Name</option>
+                      }
+                    </select>
+                  </label>
+                </div>
+                <div class="col-lg-2">
+                  <button class="btn btn-primary w-100" type="submit"><i class="bi bi-plus-circle"></i> Add</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="card guest-panel">
+            <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div>
+                <p class="admin-kicker mb-1">Planning list</p>
+                <h2 class="card-title mb-0">Saved tasks</h2>
+              </div>
+              <span class="badge bg-light-primary">@Model.Tasks.Count total</span>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="task-table guest-table table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Task</th>
+                      <th>Assigned</th>
+                      <th>Status</th>
+                      <th>Updated</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach (var task in Model.Tasks)
+                    {
+                      <tr data-task-row data-id="@task.Id" data-title="@task.Title" data-notes="@task.Notes" data-assigned-to-person-id="@task.AssignedToPersonId" data-complete="@task.IsComplete.ToString().ToLowerInvariant()">
+                        <td>
+                          <div class="fw-bold">@task.Title</div>
+                          <span class="task-notes">@(string.IsNullOrWhiteSpace(task.Notes) ? "No notes added" : task.Notes)</span>
+                        </td>
+                        <td><span class="badge bg-light-secondary">@(string.IsNullOrWhiteSpace(task.AssignedToName) ? "Unassigned" : task.AssignedToName)</span></td>
+                        <td><span class="badge @(task.IsComplete ? "bg-light-success" : "bg-light-warning")">@(task.IsComplete ? "Complete" : "Pending")</span></td>
+                        <td>@task.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                        <td>
+                          <div class="table-actions">
+                            <form method="post" asp-page-handler="Toggle" class="d-inline">
+                              <input type="hidden" name="id" value="@task.Id" />
+                              <input type="hidden" name="isComplete" value="@((!task.IsComplete).ToString().ToLowerInvariant())" />
+                              <button class="btn btn-sm @(task.IsComplete ? "btn-outline-warning" : "btn-outline-success")" type="submit">
+                                <i class="bi @(task.IsComplete ? "bi-arrow-counterclockwise" : "bi-check2-circle")"></i>
+                                @(task.IsComplete ? "Reopen" : "Complete")
+                              </button>
+                            </form>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-task-edit-button data-bs-toggle="modal" data-bs-target="#editTaskModal"><i class="bi bi-pencil-square"></i> Edit</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-task-delete-button data-bs-toggle="modal" data-bs-target="#deleteTaskModal"><i class="bi bi-trash"></i> Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer>
+          <div class="footer clearfix mb-0 text-muted">
+            <div class="float-start">
+              <p>2027 &copy; Mikail & Dershia Wedding RSVP</p>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <div class="toast-region toast-container position-fixed bottom-0 end-0 p-3" data-toast-region data-toast-message="@Model.ToastMessage" data-toast-tone="@Model.ToastTone" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="edit-task-title" data-task-edit-modal>
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <section class="modal-content admin-modal">
+          <div class="modal-header">
+            <div>
+              <p class="admin-kicker">Edit task</p>
+              <h2 class="modal-title" id="edit-task-title">Update wedding to-do</h2>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" data-modal-close aria-label="Close"></button>
+          </div>
+          <form method="post" asp-page-handler="Update" class="modal-form" data-task-edit-form>
+            <div class="modal-body">
+              <input type="hidden" name="TaskItem.Id" data-task-edit-field="id" />
+              <input type="hidden" name="TaskItem.IsComplete" data-task-edit-field="complete" />
+              <label class="form-label">Task title<input class="form-control" name="TaskItem.Title" data-task-edit-field="title" maxlength="160" required /></label>
+              <label class="form-label">Assign to
+                <select class="form-select" name="TaskItem.AssignedToPersonId" data-task-edit-field="assignedToPersonId">
+                  <option value="">Unassigned</option>
+                  @foreach (var person in Model.People)
+                  {
+                    <option value="@person.Id">@person.Name</option>
+                  }
+                </select>
+              </label>
+              <label class="form-label">Notes<textarea class="form-control" name="TaskItem.Notes" rows="4" maxlength="500" data-task-edit-field="notes"></textarea></label>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal" data-modal-close>Cancel</button><button type="submit" class="btn btn-primary">Save task</button></div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="delete-task-title" data-task-delete-modal>
+      <div class="modal-dialog modal-dialog-centered">
+        <section class="modal-content admin-modal confirm-modal">
+          <div class="modal-header">
+            <div>
+              <p class="admin-kicker">Confirm delete</p>
+              <h2 class="modal-title" id="delete-task-title">Are you sure?</h2>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" data-modal-close aria-label="Close"></button>
+          </div>
+          <div class="modal-body"><p>This will permanently remove <strong data-task-delete-title>this task</strong> from the planning list.</p></div>
+          <form method="post" asp-page-handler="Delete" class="modal-form" data-task-delete-form>
+            <input type="hidden" name="id" data-task-delete-id />
+            <div class="modal-footer"><button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal" data-modal-close>Keep task</button><button type="submit" class="btn btn-danger">Delete task</button></div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <script src="/vendor/mazer/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="/vendor/mazer/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/mazer/assets/js/main.js"></script>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

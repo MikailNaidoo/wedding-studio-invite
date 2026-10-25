@@ -1,0 +1,202 @@
+@page
+@model WeddingStudioInvite.Pages.Admin.PeopleModel
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>People | Mikail & Dershia</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/css/bootstrap.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/vendors/bootstrap-icons/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/vendors/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/css/app.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body class="admin-body mazer-admin-shell">
+    <div id="app">
+      <aside id="sidebar" class="active" aria-label="Admin sidebar">
+        <div class="sidebar-wrapper active">
+          <div class="sidebar-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <a class="mazer-brand" href="/Admin" aria-label="Mikail and Dershia admin">M&D</a>
+              <button class="sidebar-hide d-xl-none d-block border-0 bg-transparent" type="button" data-sidebar-toggle aria-label="Close sidebar">
+                <i class="bi bi-x bi-middle"></i>
+              </button>
+            </div>
+          </div>
+          <div class="sidebar-menu">
+            <ul class="menu">
+              <li class="sidebar-title">Wedding Admin</li>
+              <li class="sidebar-item"><a href="/Admin" class="sidebar-link"><i class="bi bi-grid-fill"></i><span>Dashboard</span></a></li>
+              <li class="sidebar-item"><a href="/Admin/Seating" class="sidebar-link"><i class="bi bi-diagram-3-fill"></i><span>Seating Plan</span></a></li>
+              <li class="sidebar-item"><a href="/Admin/Tasks" class="sidebar-link"><i class="bi bi-check2-square"></i><span>Tasks</span></a></li>
+              <li class="sidebar-item active"><a href="/Admin/People" class="sidebar-link"><i class="bi bi-people-fill"></i><span>People</span></a></li>
+              <li class="sidebar-item"><a href="/#rsvp" class="sidebar-link"><i class="bi bi-heart-fill"></i><span>Invitation</span></a></li>
+              <li class="sidebar-item"><a href="/Admin?handler=Export" class="sidebar-link"><i class="bi bi-file-earmark-spreadsheet-fill"></i><span>Export CSV</span></a></li>
+            </ul>
+          </div>
+          <button class="sidebar-toggler btn x" type="button" data-sidebar-toggle aria-label="Toggle sidebar">
+            <i data-feather="x"></i>
+          </button>
+        </div>
+      </aside>
+
+      <main id="main">
+        <header class="mb-3">
+          <button class="burger-btn d-block d-xl-none border-0 bg-transparent" type="button" data-sidebar-toggle aria-label="Open sidebar">
+            <i class="bi bi-justify fs-3"></i>
+          </button>
+        </header>
+
+        <div class="page-heading">
+          <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+              <p class="admin-kicker">Wedding team</p>
+              <h1>People</h1>
+              <p class="text-subtitle text-muted">Create the people who can be assigned to wedding planning tasks.</p>
+            </div>
+            <a class="btn btn-outline-secondary" href="/Admin">
+              <i class="bi bi-arrow-left"></i> Back to dashboard
+            </a>
+          </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.DatabaseStatusMessage))
+        {
+          <section class="alert alert-danger database-alert" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@Model.DatabaseStatusMessage</span>
+          </section>
+        }
+
+        <section class="section">
+          <div class="card guest-panel task-create-card">
+            <div class="card-header">
+              <div>
+                <p class="admin-kicker mb-1">New person</p>
+                <h2 class="card-title mb-0">Add someone to assign tasks to</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <form method="post" asp-page-handler="Create" class="row g-3 align-items-end">
+                <div class="col-lg-5">
+                  <label class="form-label">Name
+                    <input class="form-control" name="PersonItem.Name" maxlength="160" required placeholder="Dershia Nadesan" />
+                  </label>
+                </div>
+                <div class="col-lg-5">
+                  <label class="form-label">Role
+                    <input class="form-control" name="PersonItem.Role" maxlength="160" placeholder="Bride, groom, coordinator, family" />
+                  </label>
+                </div>
+                <div class="col-lg-2">
+                  <button class="btn btn-primary w-100" type="submit"><i class="bi bi-plus-circle"></i> Add</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="card guest-panel">
+            <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div>
+                <p class="admin-kicker mb-1">Assignable people</p>
+                <h2 class="card-title mb-0">Saved people</h2>
+              </div>
+              <span class="badge bg-light-primary">@Model.People.Count total</span>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="people-table guest-table table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Role</th>
+                      <th>Updated</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach (var person in Model.People)
+                    {
+                      <tr data-person-row data-id="@person.Id" data-name="@person.Name" data-role="@person.Role">
+                        <td><div class="fw-bold">@person.Name</div></td>
+                        <td>@(string.IsNullOrWhiteSpace(person.Role) ? "-" : person.Role)</td>
+                        <td>@person.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                        <td>
+                          <div class="table-actions">
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-person-edit-button data-bs-toggle="modal" data-bs-target="#editPersonModal"><i class="bi bi-pencil-square"></i> Edit</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-person-delete-button data-bs-toggle="modal" data-bs-target="#deletePersonModal"><i class="bi bi-trash"></i> Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <footer>
+          <div class="footer clearfix mb-0 text-muted">
+            <div class="float-start">
+              <p>2027 &copy; Mikail & Dershia Wedding RSVP</p>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <div class="toast-region toast-container position-fixed bottom-0 end-0 p-3" data-toast-region data-toast-message="@Model.ToastMessage" data-toast-tone="@Model.ToastTone" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="modal fade" id="editPersonModal" tabindex="-1" aria-labelledby="edit-person-title" data-person-edit-modal>
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <section class="modal-content admin-modal">
+          <div class="modal-header">
+            <div>
+              <p class="admin-kicker">Edit person</p>
+              <h2 class="modal-title" id="edit-person-title">Update person</h2>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" data-modal-close aria-label="Close"></button>
+          </div>
+          <form method="post" asp-page-handler="Update" class="modal-form" data-person-edit-form>
+            <div class="modal-body">
+              <input type="hidden" name="PersonItem.Id" data-person-edit-field="id" />
+              <label class="form-label">Name<input class="form-control" name="PersonItem.Name" data-person-edit-field="name" maxlength="160" required /></label>
+              <label class="form-label">Role<input class="form-control" name="PersonItem.Role" data-person-edit-field="role" maxlength="160" /></label>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal" data-modal-close>Cancel</button><button type="submit" class="btn btn-primary">Save person</button></div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <div class="modal fade" id="deletePersonModal" tabindex="-1" aria-labelledby="delete-person-title" data-person-delete-modal>
+      <div class="modal-dialog modal-dialog-centered">
+        <section class="modal-content admin-modal confirm-modal">
+          <div class="modal-header">
+            <div>
+              <p class="admin-kicker">Confirm delete</p>
+              <h2 class="modal-title" id="delete-person-title">Are you sure?</h2>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" data-modal-close aria-label="Close"></button>
+          </div>
+          <div class="modal-body"><p>This will remove <strong data-person-delete-name>this person</strong> and clear them from assigned tasks.</p></div>
+          <form method="post" asp-page-handler="Delete" class="modal-form" data-person-delete-form>
+            <input type="hidden" name="id" data-person-delete-id />
+            <div class="modal-footer"><button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal" data-modal-close>Keep person</button><button type="submit" class="btn btn-danger">Delete person</button></div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <script src="/vendor/mazer/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="/vendor/mazer/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/mazer/assets/js/main.js"></script>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

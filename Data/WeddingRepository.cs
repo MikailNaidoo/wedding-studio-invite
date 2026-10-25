@@ -30,6 +30,45 @@ public sealed class WeddingRepository(IConfiguration configuration) : IWeddingRe
             );
             CREATE INDEX IF NOT EXISTS ix_rsvp_submissions_full_name ON rsvp_submissions (LOWER(full_name));
             CREATE INDEX IF NOT EXISTS ix_rsvp_submissions_admin_status ON rsvp_submissions (admin_status);
+
+            CREATE TABLE IF NOT EXISTS admin_tasks (
+                id BIGSERIAL PRIMARY KEY,
+                title TEXT NOT NULL,
+                notes TEXT NOT NULL DEFAULT '',
+                assigned_to_person_id BIGINT NULL,
+                is_complete BOOLEAN NOT NULL DEFAULT FALSE,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+            CREATE TABLE IF NOT EXISTS admin_people (
+                id BIGSERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                role TEXT NOT NULL DEFAULT '',
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+            CREATE TABLE IF NOT EXISTS seating_layout (
+                table_number INTEGER PRIMARY KEY,
+                x_percent NUMERIC(6, 3) NOT NULL,
+                y_percent NUMERIC(6, 3) NOT NULL,
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+            CREATE TABLE IF NOT EXISTS created_seating_tables (
+                table_number INTEGER PRIMARY KEY,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+            CREATE TABLE IF NOT EXISTS guest_seating_assignments (
+                rsvp_submission_id BIGINT NOT NULL UNIQUE REFERENCES rsvp_submissions(id) ON DELETE CASCADE,
+                table_number INTEGER NOT NULL,
+                seat_number INTEGER NOT NULL,
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                UNIQUE (table_number, seat_number)
+            );
+            ALTER TABLE admin_tasks ADD COLUMN IF NOT EXISTS assigned_to_person_id BIGINT NULL;
+            CREATE INDEX IF NOT EXISTS ix_admin_tasks_is_complete ON admin_tasks (is_complete);
+            CREATE INDEX IF NOT EXISTS ix_admin_tasks_assigned_to_person_id ON admin_tasks (assigned_to_person_id);
+            CREATE INDEX IF NOT EXISTS ix_admin_people_name ON admin_people (LOWER(name));
             """;
 
         await using var connection = await OpenConnectionAsync(cancellationToken);
@@ -230,6 +269,351 @@ public sealed class WeddingRepository(IConfiguration configuration) : IWeddingRe
         return Encoding.UTF8.GetBytes(csv.ToString());
     }
 
+    public async Task<long> CreateTaskAsync(TodoItem task, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            INSERT INTO admin_tasks (title, notes, assigned_to_person_id, is_complete, created_at, updated_at)
+            VALUES (@title, @notes, @assigned_to_person_id, @is_complete, @created_at, @updated_at)
+            RETURNING id;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        AddTaskParameters(command, task);
+        return (long)(await command.ExecuteScalarAsync(cancellationToken) ?? 0L);
+    }
+
+    public async Task<IReadOnlyList<TodoItem>> ListTasksAsync(CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            SELECT t.id, t.title, t.notes, t.assigned_to_person_id, COALESCE(p.name, '') AS assigned_to_name,
+                   t.is_complete, t.created_at, t.updated_at
+            FROM admin_tasks t
+            LEFT JOIN admin_people p ON p.id = t.assigned_to_person_id
+            ORDER BY t.is_complete ASC, t.updated_at DESC, t.id DESC;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        var tasks = new List<TodoItem>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            tasks.Add(ReadTask(reader));
+        }
+
+        return tasks;
+    }
+
+    public async Task UpdateTaskAsync(TodoItem task, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            UPDATE admin_tasks
+            SET title = @title,
+                notes = @notes,
+                assigned_to_person_id = @assigned_to_person_id,
+                is_complete = @is_complete,
+                updated_at = @updated_at
+            WHERE id = @id;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        AddTaskParameters(command, task);
+        command.Parameters.AddWithValue("id", task.Id);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task UpdateTaskCompletionAsync(long id, bool isComplete, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = "UPDATE admin_tasks SET is_complete = @is_complete, updated_at = @updated_at WHERE id = @id;";
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("id", id);
+        command.Parameters.AddWithValue("is_complete", isComplete);
+        command.Parameters.AddWithValue("updated_at", DateTimeOffset.UtcNow);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task DeleteTaskAsync(long id, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand("DELETE FROM admin_tasks WHERE id = @id;", connection);
+        command.Parameters.AddWithValue("id", id);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task<long> CreatePersonAsync(Person person, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            INSERT INTO admin_people (name, role, created_at, updated_at)
+            VALUES (@name, @role, @created_at, @updated_at)
+            RETURNING id;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        AddPersonParameters(command, person);
+        return (long)(await command.ExecuteScalarAsync(cancellationToken) ?? 0L);
+    }
+
+    public async Task<IReadOnlyList<Person>> ListPeopleAsync(CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            SELECT id, name, role, created_at, updated_at
+            FROM admin_people
+            ORDER BY LOWER(name), id;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        var people = new List<Person>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            people.Add(ReadPerson(reader));
+        }
+
+        return people;
+    }
+
+    public async Task UpdatePersonAsync(Person person, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            UPDATE admin_people
+            SET name = @name,
+                role = @role,
+                updated_at = @updated_at
+            WHERE id = @id;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        AddPersonParameters(command, person);
+        command.Parameters.AddWithValue("id", person.Id);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task DeletePersonAsync(long id, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            UPDATE admin_tasks SET assigned_to_person_id = NULL, updated_at = @updated_at WHERE assigned_to_person_id = @id;
+            DELETE FROM admin_people WHERE id = @id;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("id", id);
+        command.Parameters.AddWithValue("updated_at", DateTimeOffset.UtcNow);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<RsvpSubmission>> ListAttendingGuestsAsync(CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            SELECT id, full_name, attending, guest_count, dietary_notes, guest_message, admin_notes, admin_status,
+                   submitted_at, updated_at, ip_address, user_agent, rejected_reason
+            FROM rsvp_submissions
+            WHERE attending = TRUE
+            ORDER BY LOWER(full_name), id
+            LIMIT 150;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        var submissions = new List<RsvpSubmission>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            submissions.Add(ReadSubmission(reader));
+        }
+
+        return submissions;
+    }
+
+    public async Task<IReadOnlyList<SeatingLayoutPosition>> ListSeatingLayoutAsync(CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            SELECT table_number, x_percent, y_percent, updated_at
+            FROM seating_layout
+            ORDER BY table_number;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        var positions = new List<SeatingLayoutPosition>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            positions.Add(new SeatingLayoutPosition
+            {
+                TableNumber = reader.GetInt32(0),
+                XPercent = reader.GetDecimal(1),
+                YPercent = reader.GetDecimal(2),
+                UpdatedAt = reader.GetFieldValue<DateTimeOffset>(3)
+            });
+        }
+
+        return positions;
+    }
+
+    public async Task<IReadOnlyList<CreatedSeatingTable>> ListCreatedSeatingTablesAsync(CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            SELECT table_number, created_at, updated_at
+            FROM created_seating_tables
+            ORDER BY table_number;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        var tables = new List<CreatedSeatingTable>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            tables.Add(new CreatedSeatingTable
+            {
+                TableNumber = reader.GetInt32(0),
+                CreatedAt = reader.GetFieldValue<DateTimeOffset>(1),
+                UpdatedAt = reader.GetFieldValue<DateTimeOffset>(2)
+            });
+        }
+
+        return tables;
+    }
+
+    public async Task CreateSeatingTableAsync(int tableNumber, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            INSERT INTO created_seating_tables (table_number, created_at, updated_at)
+            VALUES (@table_number, @created_at, @updated_at)
+            ON CONFLICT (table_number) DO UPDATE
+            SET updated_at = EXCLUDED.updated_at;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        command.Parameters.AddWithValue("table_number", tableNumber);
+        command.Parameters.AddWithValue("created_at", DateTimeOffset.UtcNow);
+        command.Parameters.AddWithValue("updated_at", DateTimeOffset.UtcNow);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task SaveSeatingLayoutAsync(IReadOnlyList<SeatingLayoutPosition> positions, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            INSERT INTO seating_layout (table_number, x_percent, y_percent, updated_at)
+            VALUES (@table_number, @x_percent, @y_percent, @updated_at)
+            ON CONFLICT (table_number) DO UPDATE
+            SET x_percent = EXCLUDED.x_percent,
+                y_percent = EXCLUDED.y_percent,
+                updated_at = EXCLUDED.updated_at;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+
+        foreach (var position in positions)
+        {
+            await using var command = new NpgsqlCommand(sql, connection, transaction);
+            command.Parameters.AddWithValue("table_number", position.TableNumber);
+            command.Parameters.AddWithValue("x_percent", position.XPercent);
+            command.Parameters.AddWithValue("y_percent", position.YPercent);
+            command.Parameters.AddWithValue("updated_at", DateTimeOffset.UtcNow);
+            await command.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        await transaction.CommitAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<SeatingAssignment>> ListSeatingAssignmentsAsync(CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            SELECT a.rsvp_submission_id, a.table_number, a.seat_number, r.full_name, a.updated_at
+            FROM guest_seating_assignments a
+            JOIN rsvp_submissions r ON r.id = a.rsvp_submission_id
+            WHERE r.attending = TRUE
+            ORDER BY a.table_number, a.seat_number;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        var assignments = new List<SeatingAssignment>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            assignments.Add(new SeatingAssignment
+            {
+                RsvpSubmissionId = reader.GetInt64(0),
+                TableNumber = reader.GetInt32(1),
+                SeatNumber = reader.GetInt32(2),
+                GuestName = reader.GetString(3),
+                UpdatedAt = reader.GetFieldValue<DateTimeOffset>(4)
+            });
+        }
+
+        return assignments;
+    }
+
+    public async Task SaveSeatingAssignmentAsync(SeatingAssignment assignment, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        const string sql = """
+            INSERT INTO created_seating_tables (table_number, created_at, updated_at)
+            VALUES (@table_number, @updated_at, @updated_at)
+            ON CONFLICT (table_number) DO UPDATE
+            SET updated_at = EXCLUDED.updated_at;
+
+            DELETE FROM guest_seating_assignments
+            WHERE table_number = @table_number
+              AND seat_number = @seat_number
+              AND rsvp_submission_id <> @rsvp_submission_id;
+
+            INSERT INTO guest_seating_assignments (rsvp_submission_id, table_number, seat_number, updated_at)
+            VALUES (@rsvp_submission_id, @table_number, @seat_number, @updated_at)
+            ON CONFLICT (rsvp_submission_id) DO UPDATE
+            SET table_number = EXCLUDED.table_number,
+                seat_number = EXCLUDED.seat_number,
+                updated_at = EXCLUDED.updated_at;
+            """;
+
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand(sql, connection);
+        AddSeatingAssignmentParameters(command, assignment);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task ClearSeatingAssignmentAsync(long rsvpSubmissionId, CancellationToken cancellationToken = default)
+    {
+        await EnsureInitializedAsync(cancellationToken);
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var command = new NpgsqlCommand("DELETE FROM guest_seating_assignments WHERE rsvp_submission_id = @rsvp_submission_id;", connection);
+        command.Parameters.AddWithValue("rsvp_submission_id", rsvpSubmissionId);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
     private async Task EnsureInitializedAsync(CancellationToken cancellationToken)
     {
         if (_initialized)
@@ -287,6 +671,32 @@ public sealed class WeddingRepository(IConfiguration configuration) : IWeddingRe
         command.Parameters.AddWithValue("rejected_reason", submission.RejectedReason);
     }
 
+    private static void AddTaskParameters(NpgsqlCommand command, TodoItem task)
+    {
+        command.Parameters.AddWithValue("title", task.Title.Trim());
+        command.Parameters.AddWithValue("notes", task.Notes.Trim());
+        command.Parameters.AddWithValue("assigned_to_person_id", task.AssignedToPersonId.HasValue ? task.AssignedToPersonId.Value : DBNull.Value);
+        command.Parameters.AddWithValue("is_complete", task.IsComplete);
+        command.Parameters.AddWithValue("created_at", task.CreatedAt);
+        command.Parameters.AddWithValue("updated_at", DateTimeOffset.UtcNow);
+    }
+
+    private static void AddPersonParameters(NpgsqlCommand command, Person person)
+    {
+        command.Parameters.AddWithValue("name", person.Name.Trim());
+        command.Parameters.AddWithValue("role", person.Role.Trim());
+        command.Parameters.AddWithValue("created_at", person.CreatedAt);
+        command.Parameters.AddWithValue("updated_at", DateTimeOffset.UtcNow);
+    }
+
+    private static void AddSeatingAssignmentParameters(NpgsqlCommand command, SeatingAssignment assignment)
+    {
+        command.Parameters.AddWithValue("rsvp_submission_id", assignment.RsvpSubmissionId);
+        command.Parameters.AddWithValue("table_number", assignment.TableNumber);
+        command.Parameters.AddWithValue("seat_number", assignment.SeatNumber);
+        command.Parameters.AddWithValue("updated_at", DateTimeOffset.UtcNow);
+    }
+
     private static RsvpSubmission ReadSubmission(NpgsqlDataReader reader)
     {
         return new RsvpSubmission
@@ -304,6 +714,33 @@ public sealed class WeddingRepository(IConfiguration configuration) : IWeddingRe
             IpAddress = reader.GetString(10),
             UserAgent = reader.GetString(11),
             RejectedReason = reader.GetString(12)
+        };
+    }
+
+    private static TodoItem ReadTask(NpgsqlDataReader reader)
+    {
+        return new TodoItem
+        {
+            Id = reader.GetInt64(0),
+            Title = reader.GetString(1),
+            Notes = reader.GetString(2),
+            AssignedToPersonId = reader.IsDBNull(3) ? null : reader.GetInt64(3),
+            AssignedToName = reader.GetString(4),
+            IsComplete = reader.GetBoolean(5),
+            CreatedAt = reader.GetFieldValue<DateTimeOffset>(6),
+            UpdatedAt = reader.GetFieldValue<DateTimeOffset>(7)
+        };
+    }
+
+    private static Person ReadPerson(NpgsqlDataReader reader)
+    {
+        return new Person
+        {
+            Id = reader.GetInt64(0),
+            Name = reader.GetString(1),
+            Role = reader.GetString(2),
+            CreatedAt = reader.GetFieldValue<DateTimeOffset>(3),
+            UpdatedAt = reader.GetFieldValue<DateTimeOffset>(4)
         };
     }
 
