@@ -1,0 +1,364 @@
+@page
+@model WeddingStudioInvite.Pages.Admin.SeatingModel
+@using System.Globalization
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Seating Plan | Mikail & Dershia</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/css/bootstrap.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/vendors/bootstrap-icons/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/vendors/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="/vendor/mazer/assets/css/app.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link rel="stylesheet" href="/css/seating.css" />
+  </head>
+  <body class="admin-body mazer-admin-shell">
+    <div id="app">
+      <aside id="sidebar" class="active" aria-label="Admin sidebar">
+        <div class="sidebar-wrapper active">
+          <div class="sidebar-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <a class="mazer-brand" href="/Admin" aria-label="Mikail and Dershia admin">M&D</a>
+              <button class="sidebar-hide d-xl-none d-block border-0 bg-transparent" type="button" data-sidebar-toggle aria-label="Close sidebar">
+                <i class="bi bi-x bi-middle"></i>
+              </button>
+            </div>
+          </div>
+          <div class="sidebar-menu">
+            <ul class="menu">
+              <li class="sidebar-title">Wedding Admin</li>
+              <li class="sidebar-item">
+                <a href="/Admin" class="sidebar-link">
+                  <i class="bi bi-grid-fill"></i>
+                  <span>Dashboard</span>
+                </a>
+              </li>
+              <li class="sidebar-item active">
+                <a href="/Admin/Seating" class="sidebar-link">
+                  <i class="bi bi-diagram-3-fill"></i>
+                  <span>Seating Plan</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="/Admin/Tasks" class="sidebar-link">
+                  <i class="bi bi-check2-square"></i>
+                  <span>Tasks</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="/Admin/People" class="sidebar-link">
+                  <i class="bi bi-people-fill"></i>
+                  <span>People</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="/#rsvp" class="sidebar-link">
+                  <i class="bi bi-heart-fill"></i>
+                  <span>Invitation</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="/Admin?handler=Export" class="sidebar-link">
+                  <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+                  <span>Export CSV</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <button class="sidebar-toggler btn x" type="button" data-sidebar-toggle aria-label="Toggle sidebar">
+            <i data-feather="x"></i>
+          </button>
+        </div>
+      </aside>
+
+      <main id="main">
+        <header class="mb-3">
+          <button class="burger-btn d-block d-xl-none border-0 bg-transparent" type="button" data-sidebar-toggle aria-label="Open sidebar">
+            <i class="bi bi-justify fs-3"></i>
+          </button>
+        </header>
+
+        <div class="page-heading">
+          <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+              <p class="admin-kicker">Guest flow</p>
+              <h1>Seating Plan</h1>
+              <p class="text-subtitle text-muted">@Model.TableCountDisplay tables, @Model.SeatsPerTableDisplay seats each, @Model.AssignedGuestCount attending guests seated.</p>
+            </div>
+            <a class="btn btn-outline-secondary" href="/Admin">
+              <i class="bi bi-arrow-left"></i> Back to dashboard
+            </a>
+          </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.DatabaseStatusMessage))
+        {
+          <section class="alert alert-warning d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>@Model.DatabaseStatusMessage</span>
+          </section>
+        }
+
+        <section class="section seating-layout seating-layout-full">
+          <div class="card seating-card seating-plan-card">
+            <div class="card-header">
+              <div>
+                <p class="admin-kicker mb-1">Reception map</p>
+                <h2 class="card-title mb-0">Guest seating floor plan</h2>
+              </div>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="badge bg-light-primary">@Model.AssignedGuestCount attending guests</span>
+                <span class="badge bg-light-secondary">@Model.TotalSeats total seats</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="seating-workspace">
+                <div class="floor-plan-scroll" aria-label="Scrollable reception floor plan">
+                  <form method="post" class="d-none">@Html.AntiForgeryToken()</form>
+                  <div class="seating-floor-plan" data-seating-stage data-layout-url="/Admin/Seating?handler=Layout" aria-label="Floor-plan seating chart with 15 tables and 150 seats">
+                    <div class="floor-label floor-label-entrance">Entrance</div>
+                    <div class="floor-label floor-label-stage">Stage</div>
+                    <div class="head-table" aria-label="Head table">
+                      <span>Head Table</span>
+                      <ul>
+                        <li>Mikail</li>
+                        <li>Dershia</li>
+                        <li>Family</li>
+                      </ul>
+                    </div>
+
+                    <div class="dance-floor" aria-label="Dance floor">Dance Floor</div>
+
+                    <div class="floor-table-grid">
+                      @if (Model.VisualizedTables.Count == 0)
+                      {
+                        <div class="seating-empty-map">
+                          <p class="admin-kicker mb-1">No tables created yet</p>
+                          <h3>Create a table below to make it visible on the floor plan.</h3>
+                        </div>
+                      }
+                      else
+                      {
+                        @foreach (var table in Model.VisualizedTables)
+                        {
+                          var savedPosition = Model.LayoutPositions.FirstOrDefault(position => position.TableNumber == table.Number);
+                          var tableStyle = savedPosition is null ? "" : $"left: {savedPosition.XPercent.ToString("0.###", CultureInfo.InvariantCulture)}%; top: {savedPosition.YPercent.ToString("0.###", CultureInfo.InvariantCulture)}%;";
+                          var tableClass = savedPosition is null ? $"table-position-{table.Number}" : "";
+                          <section class="floor-table @tableClass" style="@tableStyle" aria-labelledby="table-@table.Number-title" data-floor-table data-table="@table.Number">
+                            <h3 id="table-@table.Number-title">Table @table.Number</h3>
+                            <p>@table.AssignedSeatCount seated</p>
+                            <div class="floor-seat-ring" aria-label="Seats for table @table.Number">
+                              @foreach (var seat in table.Seats)
+                              {
+                                var angle = (seat.SeatNumber - 1) * 36;
+                                <button
+                                  type="button"
+                                  class="floor-seat"
+                                  style="--seat-angle: @(angle)deg;"
+                                  data-seat-button
+                                  data-table="@seat.TableNumber"
+                                  data-seat="@seat.SeatNumber"
+                                  data-guest="@seat.GuestName"
+                                  data-rsvp-id="@seat.RsvpSubmissionId"
+                                  aria-label="Table @seat.TableNumber, Seat @seat.SeatNumber, @seat.DisplayName">
+                                  <span>@seat.GuestName</span>
+                                </button>
+                              }
+                            </div>
+                          </section>
+                        }
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <aside class="seat-detail-panel" aria-live="polite">
+                  <p class="admin-kicker">Selected seat</p>
+                  <h2 data-seat-detail>Choose a seat</h2>
+                  <p data-seat-summary>Use the responsive floor plan or the accessible table below to inspect assignments.</p>
+                  <dl>
+                    <div>
+                      <dt>Attending</dt>
+                      <dd>@Model.AssignedGuestCount</dd>
+                    </div>
+                    <div>
+                      <dt>Capacity</dt>
+                      <dd>@Model.TableCountDisplay</dd>
+                    </div>
+                  </dl>
+                </aside>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section seating-assignment-section" aria-labelledby="seat-assignment-title">
+          <div class="row g-4">
+            <div class="col-xl-5">
+                <div class="card guest-panel">
+                  <div class="card-header">
+                    <div>
+                    <p class="admin-kicker mb-1">Create table</p>
+                    <h2 class="card-title mb-0" id="seat-assignment-title">Create table or assign guest</h2>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                  <form class="row g-3 mb-4" method="post" asp-page-handler="CreateTable">
+                    @Html.AntiForgeryToken()
+                    <div class="col-md-7">
+                      <label class="form-label">
+                        Table
+                        <select class="form-select" name="NewTableNumber" required>
+                          @for (var tableNumber = 1; tableNumber <= Model.TableCountDisplay; tableNumber++)
+                          {
+                            <option value="@tableNumber">Table @tableNumber</option>
+                          }
+                        </select>
+                      </label>
+                    </div>
+                    <div class="col-md-5 d-flex align-items-end">
+                      <button class="btn btn-outline-primary w-100" type="submit">
+                        <i class="bi bi-plus-circle"></i> Create table
+                      </button>
+                    </div>
+                  </form>
+                  <div class="seating-form-divider" aria-hidden="true"></div>
+                  <form class="row g-3" method="post" asp-page-handler="Assign">
+                    @Html.AntiForgeryToken()
+                    <div class="col-12">
+                      <label class="form-label">
+                        Guest
+                        <select class="form-select" name="Assignment.RsvpSubmissionId" required>
+                          <option value="">Choose unassigned guest</option>
+                          @foreach (var guest in Model.UnassignedGuests)
+                          {
+                            <option value="@guest.Id">@guest.FullName</option>
+                          }
+                        </select>
+                      </label>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">
+                        Table
+                        <select class="form-select" name="Assignment.TableNumber" required>
+                          @for (var tableNumber = 1; tableNumber <= Model.TableCountDisplay; tableNumber++)
+                          {
+                            <option value="@tableNumber">Table @tableNumber</option>
+                          }
+                        </select>
+                      </label>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">
+                        Seat
+                        <select class="form-select" name="Assignment.SeatNumber" required>
+                          @for (var seatNumber = 1; seatNumber <= Model.SeatsPerTableDisplay; seatNumber++)
+                          {
+                            <option value="@seatNumber">Seat @seatNumber</option>
+                          }
+                        </select>
+                      </label>
+                    </div>
+                    <div class="col-12">
+                      <button class="btn btn-primary w-100" type="submit">
+                        <i class="bi bi-save"></i> Save seat assignment
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-7">
+              <div class="card guest-panel">
+                <div class="card-header">
+                  <div>
+                    <p class="admin-kicker mb-1">Unassigned guests</p>
+                    <h2 class="card-title mb-0">Still to place</h2>
+                  </div>
+                  <span class="badge bg-light-secondary">@Model.UnassignedGuests.Count open</span>
+                </div>
+                <div class="card-body">
+                  @if (Model.UnassignedGuests.Count == 0)
+                  {
+                    <p class="text-muted mb-0">Every attending guest has a saved seat assignment.</p>
+                  }
+                  else
+                  {
+                    <div class="unassigned-guest-list">
+                      @foreach (var guest in Model.UnassignedGuests)
+                      {
+                        <span>@guest.FullName</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        @if (Model.AssignedTables.Count > 0)
+        {
+          <section class="section seating-accessible-table" aria-labelledby="accessible-seating-title">
+            <div class="card guest-panel">
+              <div class="card-header">
+                <div>
+                  <p class="admin-kicker mb-1">Assigned tables</p>
+                  <h2 class="card-title mb-0" id="accessible-seating-title">Table assignment information</h2>
+                </div>
+                <a class="btn btn-outline-primary" href="/Admin/Seating?handler=ExportPdf">
+                  <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                </a>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="guest-table table table-hover mb-0">
+                    <thead>
+                      <tr>
+                        <th>Table</th>
+                        <th>Seat</th>
+                        <th>Guest</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @foreach (var table in Model.AssignedTables)
+                      {
+                        foreach (var seat in table.AssignedSeats)
+                        {
+                          <tr>
+                            <td>Table @seat.TableNumber</td>
+                            <td>Seat @seat.SeatNumber</td>
+                            <td>@seat.DisplayName</td>
+                            <td>
+                              <form method="post" asp-page-handler="ClearAssignment" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="rsvpSubmissionId" value="@seat.RsvpSubmissionId" />
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Clear</button>
+                              </form>
+                            </td>
+                          </tr>
+                        }
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+        }
+      </main>
+    </div>
+
+    <script src="/vendor/mazer/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="/vendor/mazer/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/mazer/assets/js/main.js"></script>
+    <script src="/js/admin.js"></script>
+    <script src="/js/seating.js"></script>
+  </body>
+</html>

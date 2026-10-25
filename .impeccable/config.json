@@ -1,0 +1,80 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-25T16:55:29.691Z",
+        "reason": "Approved editorial sections use full-bleed color fields with internal section padding; detector misreads absolute chapter markers as flush content."
+      },
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-25T16:55:29.761Z",
+        "reason": "Approved wedding editorial direction uses uppercase only for short labels and navigation, not prose."
+      },
+      {
+        "rule": "tight-leading",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-25T16:55:29.827Z",
+        "reason": "The flagged leading belongs to a large display closing note, not body copy."
+      },
+      {
+        "rule": "overused-font",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-25T16:55:29.887Z",
+        "reason": "The existing Inter fallback is retained by the approved native remodel; display typography supplies the editorial personality."
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-25T16:55:29.952Z",
+        "reason": "The established cream paper palette is intentional wedding stationery art direction preserved by the approved design brief."
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          "styles.css"
+        ],
+        "createdAt": "2026-10-25T17:31:10.761Z",
+        "reason": "User requested reuse of Wedding RSVP v2 code; Inter is its supporting typeface paired with Oranienbaum."
+      },
+      {
+        "rule": "clipped-overflow-container",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-25T17:31:10.825Z",
+        "reason": "Agent verified: html/body intentionally contain full-viewport v2 canvas and video scenes; native modal dialogs use the top layer, and wedding content has its own scroll region."
+      },
+      {
+        "rule": "wide-tracking",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-25T17:31:10.888Z",
+        "reason": "Agent reviewed both findings: address tracking reduced to .03em; remaining 0.17em belongs to the short uppercase journey instruction retained from the requested v2 design."
+      }
+    ]
+  }
+}

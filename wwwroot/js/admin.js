@@ -2,6 +2,10 @@ const toastRegion = document.querySelector("[data-toast-region]");
 const newModal = document.querySelector("[data-new-modal]");
 const editModal = document.querySelector("[data-edit-modal]");
 const deleteModal = document.querySelector("[data-delete-modal]");
+const taskEditModal = document.querySelector("[data-task-edit-modal]");
+const taskDeleteModal = document.querySelector("[data-task-delete-modal]");
+const personEditModal = document.querySelector("[data-person-edit-modal]");
+const personDeleteModal = document.querySelector("[data-person-delete-modal]");
 
 const openModal = (modal) => {
   if (!modal) return;
@@ -52,6 +56,16 @@ const setField = (form, name, value) => {
   if (field) field.value = value ?? "";
 };
 
+const setTaskField = (form, name, value) => {
+  const field = form?.querySelector(`[data-task-edit-field="${name}"]`);
+  if (field) field.value = value ?? "";
+};
+
+const setPersonField = (form, name, value) => {
+  const field = form?.querySelector(`[data-person-edit-field="${name}"]`);
+  if (field) field.value = value ?? "";
+};
+
 document.querySelector("[data-new-rsvp-button]")?.addEventListener("click", () => {
   openModal(newModal);
 });
@@ -88,11 +102,65 @@ document.querySelectorAll("[data-delete-button]").forEach((button) => {
   });
 });
 
+document.querySelectorAll("[data-task-edit-button]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const row = button.closest("[data-task-row]");
+    const form = taskEditModal?.querySelector("[data-task-edit-form]");
+    if (!row || !form) return;
+
+    setTaskField(form, "id", row.dataset.id);
+    setTaskField(form, "title", row.dataset.title);
+    setTaskField(form, "notes", row.dataset.notes);
+    setTaskField(form, "assignedToPersonId", row.dataset.assignedToPersonId);
+    setTaskField(form, "complete", row.dataset.complete);
+    openModal(taskEditModal);
+  });
+});
+
+document.querySelectorAll("[data-person-edit-button]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const row = button.closest("[data-person-row]");
+    const form = personEditModal?.querySelector("[data-person-edit-form]");
+    if (!row || !form) return;
+
+    setPersonField(form, "id", row.dataset.id);
+    setPersonField(form, "name", row.dataset.name);
+    setPersonField(form, "role", row.dataset.role);
+    openModal(personEditModal);
+  });
+});
+
+document.querySelectorAll("[data-person-delete-button]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const row = button.closest("[data-person-row]");
+    if (!row || !personDeleteModal) return;
+
+    const idInput = personDeleteModal.querySelector("[data-person-delete-id]");
+    const nameTarget = personDeleteModal.querySelector("[data-person-delete-name]");
+    if (idInput) idInput.value = row.dataset.id || "";
+    if (nameTarget) nameTarget.textContent = row.dataset.name || "this person";
+    openModal(personDeleteModal);
+  });
+});
+
+document.querySelectorAll("[data-task-delete-button]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const row = button.closest("[data-task-row]");
+    if (!row || !taskDeleteModal) return;
+
+    const idInput = taskDeleteModal.querySelector("[data-task-delete-id]");
+    const titleTarget = taskDeleteModal.querySelector("[data-task-delete-title]");
+    if (idInput) idInput.value = row.dataset.id || "";
+    if (titleTarget) titleTarget.textContent = row.dataset.title || "this task";
+    openModal(taskDeleteModal);
+  });
+});
+
 document.querySelectorAll("[data-modal-close]").forEach((button) => {
   button.addEventListener("click", () => closeModal(button.closest(".modal")));
 });
 
-document.querySelectorAll(".modal[data-new-modal], .modal[data-edit-modal], .modal[data-delete-modal]").forEach((modal) => {
+document.querySelectorAll(".modal[data-new-modal], .modal[data-edit-modal], .modal[data-delete-modal], .modal[data-task-edit-modal], .modal[data-task-delete-modal], .modal[data-person-edit-modal], .modal[data-person-delete-modal]").forEach((modal) => {
   modal.addEventListener("click", (event) => {
     if (event.target === modal) closeModal(modal);
   });
@@ -101,15 +169,6 @@ document.querySelectorAll(".modal[data-new-modal], .modal[data-edit-modal], .mod
 window.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   document.querySelectorAll(".modal.show, .modal:not([hidden])").forEach(closeModal);
-});
-
-document.querySelectorAll("[data-sidebar-toggle]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const sidebar = document.querySelector("#sidebar");
-    const wrapper = document.querySelector("#sidebar .sidebar-wrapper");
-    sidebar?.classList.toggle("active");
-    wrapper?.classList.toggle("active");
-  });
 });
 
 document.querySelectorAll("[data-status-select]").forEach((select) => {

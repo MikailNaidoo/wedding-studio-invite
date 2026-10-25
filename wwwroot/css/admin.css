@@ -210,6 +210,24 @@ body.admin-body {
   min-width: 132px;
 }
 
+.task-table {
+  min-width: 820px;
+}
+
+.task-create-card .form-label {
+  color: var(--admin-muted);
+  font-weight: 700;
+  width: 100%;
+}
+
+.task-notes {
+  color: var(--admin-muted);
+  display: block;
+  font-size: 0.88rem;
+  margin-top: 0.25rem;
+  max-width: 48rem;
+}
+
 .table-actions {
   display: flex;
   flex-wrap: wrap;
@@ -353,12 +371,24 @@ body.admin-body {
 }
 
 @media (max-width: 1199px) {
-  .mazer-admin-shell #sidebar.active {
+  .mazer-admin-shell #sidebar {
+    z-index: 1050;
+  }
+
+  .mazer-admin-shell #sidebar .sidebar-wrapper {
+    left: -300px;
+    max-width: min(300px, 86vw);
+    position: fixed;
+    width: min(300px, 86vw);
+    z-index: 1050;
+  }
+
+  .mazer-admin-shell #sidebar.active .sidebar-wrapper {
     left: 0;
   }
 
-  .mazer-admin-shell #sidebar:not(.active) {
-    left: -300px;
+  .mazer-admin-shell #sidebar:not(.active) .sidebar-wrapper {
+    left: calc(-1 * min(300px, 86vw));
   }
 }
 
