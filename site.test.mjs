@@ -1,8 +1,40 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import vm from "node:vm";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
+
+test("globe focus finds the selected country and centers its coordinates", async () => {
+  const { findContainingRing, focusPose, getCountryOutlines } = await import("./assets/v2/globe-focus.js");
+  const world = { window: {} };
+  vm.runInNewContext(read("./assets/v2/world-data.js"), world, { timeout: 1000 });
+  const rings = world.window.WORLD_RINGS;
+  const features = JSON.parse(read("./assets/v2/world.json")).features;
+
+  const southAfrica = findContainingRing(30.8922, -29.9214, rings);
+  const indonesia = findContainingRing(115.188919, -8.409518, rings);
+  const southAfricaOutlines = getCountryOutlines("South Africa", features);
+  const indonesiaOutlines = getCountryOutlines("Indonesia", features);
+
+  assert.ok(southAfrica);
+  assert.ok(indonesia);
+  assert.equal(southAfricaOutlines.length, 1);
+  assert.equal(indonesiaOutlines.length, 13);
+  assert.ok(indonesiaOutlines.some(ring => findContainingRing(115.188919, -8.409518, [ring])));
+  assert.equal(findContainingRing(-120, 0, rings), null);
+  for (const [longitude, latitude] of [[30.8922, -29.9214], [115.188919, -8.409518]]) {
+    const pose = focusPose(longitude, latitude);
+    const vector = [Math.cos(latitude * Math.PI / 180) * Math.sin(longitude * Math.PI / 180), Math.sin(latitude * Math.PI / 180), Math.cos(latitude * Math.PI / 180) * Math.cos(longitude * Math.PI / 180)];
+    const c = Math.cos(pose.rotation), s = Math.sin(pose.rotation);
+    const rotatedX = vector[0] * c + vector[2] * s;
+    const rotatedZ = vector[2] * c - vector[0] * s;
+    const centeredY = vector[1] * Math.cos(pose.tilt) - rotatedZ * Math.sin(pose.tilt);
+    assert.ok(Math.abs(rotatedX) < 1e-10);
+    assert.ok(Math.abs(centeredY) < 1e-10);
+    assert.ok(pose.zoom > 1);
+  }
+});
 
 test("defines an ASP.NET Core Razor Pages app with PostgreSQL persistence", () => {
   assert.equal(existsSync(new URL("./WeddingStudioInvite.csproj", import.meta.url)), true);
@@ -67,8 +99,8 @@ test("plays the reference message transition when navigating to Journey or Weddi
   const razorPage = read("./Pages/Index.cshtml");
   const app = read("./app.js");
 
-  assert.match(page, /<script defer src="app\.js\?v=3"><\/script>/);
-  assert.match(razorPage, /<script defer src="app\.js\?v=3"><\/script>/);
+  assert.match(page, /<script type="module" src="app\.js\?v=4"><\/script>/);
+  assert.match(razorPage, /<script type="module" src="app\.js\?v=4"><\/script>/);
   assert.match(app, /button\.addEventListener\('click',\(\)=>setView\(button\.dataset\.viewLink,button\.dataset\.viewLink!=='intro'\)\)/);
   assert.match(app, /Spin the globe to find our hidden moments\. Select a city to start\./);
   assert.match(app, /And now, Our new adventure begins\./);

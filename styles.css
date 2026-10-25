@@ -24,9 +24,10 @@ button:focus-visible,a:focus-visible,canvas:focus-visible{outline:2px solid curr
 #load-progress{font:20px Oranienbaum,serif}
 #skip-loader{color:#777;border-color:#ddd;font-size:11px}
 #skip-loader:hover{color:#fff}
-#particles{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#particles{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-events:none}
 .screen{position:fixed;inset:0}
 #intro{z-index:2;background:#161616;color:white}
+#journey{z-index:2}
 #intro-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 55%;filter:brightness(.72)}
 .intro-composition{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .name-lockup{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;font:clamp(56px,13vw,144px)/1 Oranienbaum,serif;margin:0 0 20px;padding:0 10px;color:white;mix-blend-mode:difference;font-weight:400}

@@ -1,4 +1,5 @@
 'use strict';
+import { findContainingRing, focusPose, getCountryOutlines } from './assets/v2/globe-focus.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -7,12 +8,12 @@ let currentView = 'intro';
 let soundEnabled = false;
 let transitionTimer;
 const cities = [
-  {name:'Chatsworth',place:'KwaZulu-Natal, South Africa',lat:-29.9214,lon:30.8922,side:'left',x:4,top:25},
-  {name:'Durban',place:'KwaZulu-Natal, South Africa',lat:-29.85868,lon:31.02184,side:'left',x:8,top:40},
-  {name:'Drakensberg',place:'KwaZulu-Natal, South Africa',lat:-29.4770,lon:29.2670,side:'left',x:4,top:55,video:'assets/hero-video.mp4'},
-  {name:'Johannesburg',place:'Gauteng, South Africa',lat:-26.2041,lon:28.0473,side:'right',x:4,top:40},
-  {name:'Port Shepstone',place:'KwaZulu-Natal, South Africa',lat:-30.74277,lon:30.45055,side:'right',x:4,top:55},
-  {name:'Bali',place:'Indonesia',lat:-8.409518,lon:115.188919,side:'right',x:8,top:25}
+  {name:'Chatsworth',place:'KwaZulu-Natal, South Africa',country:'South Africa',lat:-29.9214,lon:30.8922,side:'left',x:4,top:25},
+  {name:'Durban',place:'KwaZulu-Natal, South Africa',country:'South Africa',lat:-29.85868,lon:31.02184,side:'left',x:8,top:40},
+  {name:'Drakensberg',place:'KwaZulu-Natal, South Africa',country:'South Africa',lat:-29.4770,lon:29.2670,side:'left',x:4,top:55,video:'assets/hero-video.mp4'},
+  {name:'Johannesburg',place:'Gauteng, South Africa',country:'South Africa',lat:-26.2041,lon:28.0473,side:'right',x:4,top:40},
+  {name:'Port Shepstone',place:'KwaZulu-Natal, South Africa',country:'South Africa',lat:-30.74277,lon:30.45055,side:'right',x:4,top:55},
+  {name:'Bali',place:'Indonesia',country:'Indonesia',lat:-8.409518,lon:115.188919,side:'right',x:8,top:25}
 ];
 const faq = [
   ["Where will we celebrate?","The Bell Inn, 208 Kenneth Kaunda Road, Durban North, 4051."],
@@ -138,10 +139,13 @@ function updateCountdown(){
 updateCountdown();setInterval(updateCountdown,1000);
 
 const globe=$('#globe'),ctx=globe.getContext('2d'),particles=$('#particles'),pctx=particles.getContext('2d');
-let width=innerWidth,height=innerHeight,radius=0,rotation=-70*Math.PI/180,tilt=-.35,dragging=false,dragX=0,dragY=0,zoom=1,hoverCity=null;
+let width=innerWidth,height=innerHeight,radius=0,baseRadius=0,rotation=-70*Math.PI/180,tilt=-.35,dragging=false,dragX=0,dragY=0,zoom=1,hoverCity=null,focusAnimation=null;
 const radians=Math.PI/180;
 function unitPoint(lon,lat){const a=lon*radians,b=lat*radians;return [Math.cos(b)*Math.sin(a),Math.sin(b),Math.cos(b)*Math.cos(a)]}
-const paths=(window.WORLD_RINGS||[]).map(ring=>ring.map(([lon,lat])=>unitPoint(lon,lat)));
+const worldRings=window.WORLD_RINGS||[];
+const paths=worldRings.map(ring=>ring.map(([lon,lat])=>unitPoint(lon,lat)));
+let countryFeatures=[];
+fetch('assets/v2/world.json').then(response=>response.ok?response.json():[]).then(data=>{countryFeatures=data.features||[]}).catch(()=>{});
 const mesh=[];
 for(let lat=-80;lat<=80;lat+=10)for(let lon=-180;lon<180;lon+=15){
   mesh.push([unitPoint(lon,lat),unitPoint(lon+15,lat)]);
@@ -158,7 +162,11 @@ cities.forEach(city=>{
   city.vector=unitPoint(city.lon,city.lat);
   const button=document.createElement('button');button.className='city-label '+city.side;button.textContent=city.name;
   button.style[city.side]=city.x+'%';button.style.top=city.top+'%';
-  button.addEventListener('click',()=>openMemory(city));
+  button.addEventListener('click',async()=>{
+    if(focusAnimation)return;
+    await focusCity(city);
+    if(currentView==='journey')openMemory(city);
+  });
   button.addEventListener('pointerenter',()=>{hoverCity=city});
   button.addEventListener('pointerleave',()=>{hoverCity=null});
   city.button=button;$('#city-labels').append(button);
@@ -167,17 +175,18 @@ cities.forEach(city=>{
 function resizeCanvases(){
   width=innerWidth;height=innerHeight;const dpr=Math.min(devicePixelRatio||1,2);
   [globe,particles].forEach(canvas=>{canvas.width=width*dpr;canvas.height=height*dpr;canvas.getContext('2d').setTransform(dpr,0,0,dpr,0,0)});
-  radius=Math.min(height*(width<=768?.183:.211),width*.32)*zoom;
+  baseRadius=Math.min(height*(width<=768?.183:.211),width*.32);
+  radius=baseRadius*zoom;
   $('#connectors').setAttribute('viewBox','0 0 '+width+' '+height);
   renderParticles();renderGlobe();
 }
 function renderParticles(){
   pctx.clearRect(0,0,width,height);
   pctx.fillStyle=document.body.classList.contains('dark')?'#999':'#888';
-  for(let i=0;i<95;i++){
+  for(let i=0;i<145;i++){
     const x=((Math.sin(i*127.1)*43758.5453)%1+1)%1*width;
     const y=((Math.sin(i*311.7)*15213.141)%1+1)%1*height;
-    pctx.globalAlpha=.08+(i%5)*.024;pctx.beginPath();pctx.arc(x,y,i%7===0?1.4:.6,0,Math.PI*2);pctx.fill();
+    pctx.globalAlpha=.14+(i%5)*.035;pctx.beginPath();pctx.arc(x,y,i%7===0?1.35:.8,0,Math.PI*2);pctx.fill();
   }pctx.globalAlpha=1;
 }
 function renderGlobe(){
@@ -199,6 +208,21 @@ function renderGlobe(){
         previous=p;
       });
     });ctx.stroke();
+  }
+  if(focusAnimation){
+    if(focusAnimation.rings.length){
+      ctx.beginPath();
+      focusAnimation.rings.forEach(country=>{
+        country.forEach((point,index)=>{const p=project(point);if(index===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1])});
+        ctx.closePath();
+      });
+      ctx.fillStyle=dark?'rgba(245,245,245,.18)':'rgba(38,38,38,.16)';
+      ctx.strokeStyle=dark?'rgba(255,255,255,.9)':'rgba(35,35,35,.82)';
+      ctx.lineWidth=1.5;ctx.fill('evenodd');ctx.stroke();
+      const marker=project(focusAnimation.city.vector);
+      ctx.fillStyle=dark?'#fff':'#242424';ctx.beginPath();ctx.arc(marker[0],marker[1],5.5,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle=dark?'rgba(255,255,255,.55)':'rgba(36,36,36,.45)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(marker[0],marker[1],10,0,Math.PI*2);ctx.stroke();
+    }
   }
   ctx.strokeStyle=dark?'#8883':'#7772';ctx.beginPath();ctx.arc(width/2,height/2,radius,0,Math.PI*2);ctx.stroke();
   const ink=dark?'#ddd':'#333';
@@ -233,6 +257,39 @@ function animate(time){
   }requestAnimationFrame(animate);
 }
 addEventListener('resize',resizeCanvases);resizeCanvases();requestAnimationFrame(animate);
+
+function tweenPose(target,duration){
+  const start={rotation,tilt,zoom};
+  return new Promise(resolve=>{
+    const begin=performance.now();
+    function step(now){
+      const progress=duration===0?1:Math.min(1,(now-begin)/duration);
+      const eased=1-Math.pow(1-progress,3);
+      rotation=start.rotation+(target.rotation-start.rotation)*eased;
+      tilt=start.tilt+(target.tilt-start.tilt)*eased;
+      zoom=start.zoom+(target.zoom-start.zoom)*eased;
+      radius=baseRadius*zoom;
+      renderGlobe();
+      if(progress<1)requestAnimationFrame(step);else resolve();
+    }
+    requestAnimationFrame(step);
+  });
+}
+async function focusCity(city){
+  const outlines=getCountryOutlines(city.country,countryFeatures);
+  const fallback=findContainingRing(city.lon,city.lat,worldRings);
+  const rings=(outlines.length?outlines:fallback?[fallback]:[]).map(ring=>ring.map(([lon,lat])=>unitPoint(lon,lat)));
+  if(!rings.length)return;
+  const original={rotation,tilt,zoom};
+  focusAnimation={city,rings};
+  const duration=reducedMotion?0:760;
+  renderGlobe();
+  await tweenPose(focusPose(city.lon,city.lat),duration);
+  await new Promise(resolve=>setTimeout(resolve,reducedMotion?220:360));
+  await tweenPose(original,reducedMotion?0:620);
+  focusAnimation=null;
+  renderGlobe();
+}
 
 let restoreMusic=false;
 function openMemory(city){
