@@ -51,6 +51,17 @@ test("public RSVP page removes email and saves guest responses", () => {
   assert.match(model, /RsvpSpamGuard/);
 });
 
+test("uses the uploaded clip for the hero and the original clip for Drakensberg", () => {
+  const page = read("./index.html");
+  const app = read("./app.js");
+
+  assert.equal(existsSync(new URL("./assets/hero-video-new.mp4", import.meta.url)), true);
+  assert.equal(existsSync(new URL("./assets/hero-video.mp4", import.meta.url)), true);
+  assert.match(page, /<video id="intro-video"[^>]*><source src="assets\/hero-video-new\.mp4" type="video\/mp4">/);
+  assert.match(app, /\{name:'Drakensberg',[^}]*video:'assets\/hero-video\.mp4'/);
+  assert.match(app, /if\(city\.video\)\{[\s\S]*?video\.src=city\.video/);
+});
+
 test("server-side spam protection guards RSVP submissions", () => {
   assert.equal(existsSync(new URL("./Services/RsvpSpamGuard.cs", import.meta.url)), true);
   const guard = read("./Services/RsvpSpamGuard.cs");

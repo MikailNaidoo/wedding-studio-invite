@@ -9,7 +9,7 @@ let transitionTimer;
 const cities = [
   {name:'Chatsworth',place:'KwaZulu-Natal, South Africa',lat:-29.9214,lon:30.8922,side:'left',x:4,top:25},
   {name:'Durban',place:'KwaZulu-Natal, South Africa',lat:-29.85868,lon:31.02184,side:'left',x:8,top:40},
-  {name:'Drakensberg',place:'KwaZulu-Natal, South Africa',lat:-29.4770,lon:29.2670,side:'left',x:4,top:55},
+  {name:'Drakensberg',place:'KwaZulu-Natal, South Africa',lat:-29.4770,lon:29.2670,side:'left',x:4,top:55,video:'assets/hero-video.mp4'},
   {name:'Johannesburg',place:'Gauteng, South Africa',lat:-26.2041,lon:28.0473,side:'right',x:4,top:40},
   {name:'Port Shepstone',place:'KwaZulu-Natal, South Africa',lat:-30.74277,lon:30.45055,side:'right',x:4,top:55},
   {name:'Bali',place:'Indonesia',lat:-8.409518,lon:115.188919,side:'right',x:8,top:25}
@@ -238,12 +238,16 @@ let restoreMusic=false;
 function openMemory(city){
   $('#memory-city').textContent=city.name;
   $('#memory-place').textContent=city.place;
-  $('#memory-error').hidden=false;
-  $('#memory-error').textContent='Memories from '+city.name+' are coming soon.';
   $('#memory-coordinates').textContent=Math.abs(city.lat).toFixed(4)+'° S, '+city.lon.toFixed(4)+'° E';
   const video=$('#memory-video');
-  video.hidden=true;
+  const error=$('#memory-error');
+  video.pause();
   video.removeAttribute('src');
+  video.load();
+  video.hidden=!city.video;
+  error.hidden=Boolean(city.video);
+  error.textContent=city.video?'This film could not load. Please try again when connected.':'Memories from '+city.name+' are coming soon.';
+  if(city.video){video.src=city.video;video.load();video.play().catch(()=>{});}
   restoreMusic=!$('#music').paused;$('#music').pause();
   $('#memory-dialog').showModal();
 }
