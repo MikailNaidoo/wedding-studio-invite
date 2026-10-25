@@ -62,6 +62,18 @@ test("uses the uploaded clip for the hero and the original clip for Drakensberg"
   assert.match(app, /if\(city\.video\)\{[\s\S]*?video\.src=city\.video/);
 });
 
+test("plays the reference message transition when navigating to Journey or Wedding", () => {
+  const page = read("./index.html");
+  const razorPage = read("./Pages/Index.cshtml");
+  const app = read("./app.js");
+
+  assert.match(page, /<script defer src="app\.js\?v=3"><\/script>/);
+  assert.match(razorPage, /<script defer src="app\.js\?v=3"><\/script>/);
+  assert.match(app, /button\.addEventListener\('click',\(\)=>setView\(button\.dataset\.viewLink,button\.dataset\.viewLink!=='intro'\)\)/);
+  assert.match(app, /Spin the globe to find our hidden moments\. Select a city to start\./);
+  assert.match(app, /And now, Our new adventure begins\./);
+});
+
 test("server-side spam protection guards RSVP submissions", () => {
   assert.equal(existsSync(new URL("./Services/RsvpSpamGuard.cs", import.meta.url)), true);
   const guard = read("./Services/RsvpSpamGuard.cs");

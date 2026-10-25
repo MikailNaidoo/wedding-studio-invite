@@ -49,7 +49,7 @@ function setView(view,animate=false){
   clearTimeout(transitionTimer);
   $('#transition').classList.remove('show');
   if(animate&&!reducedMotion&&view!==currentView){
-    $('#transition p').textContent=(view==='journey'?'Spin the globe. Discover our memories.':'And now, a new chapter together.');
+    $('#transition p').textContent=(view==='journey'?'Spin the globe to find our hidden moments. Select a city to start.':'And now, Our new adventure begins.');
     $('#transition').classList.add('show');
     transitionTimer=setTimeout(()=>{activateView(view);$('#transition').classList.remove('show')},1000);
   }else activateView(view);
@@ -87,7 +87,7 @@ function activateView(view){
   void syncSoundToView();
   if(view==='journey'){resizeCanvases();renderGlobe()}
 }
-$$('[data-view-link]').forEach(button=>button.addEventListener('click',()=>setView(button.dataset.viewLink)));
+$$('[data-view-link]').forEach(button=>button.addEventListener('click',()=>setView(button.dataset.viewLink,button.dataset.viewLink!=='intro')));
 $('#explore').addEventListener('click',()=>setView('journey',true));
 $$('[data-tab]').forEach(button=>button.addEventListener('click',()=>{
   $$('[data-tab]').forEach(tab=>tab.setAttribute('aria-selected',String(tab===button)));
