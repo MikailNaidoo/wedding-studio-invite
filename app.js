@@ -4,6 +4,7 @@ const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let currentView = 'intro';
+let soundEnabled = false;
 let transitionTimer;
 const cities = [
   {name:'Chatsworth',place:'KwaZulu-Natal, South Africa',lat:-29.9214,lon:30.8922,side:'left',x:4,top:25},
@@ -53,6 +54,26 @@ function setView(view,animate=false){
     transitionTimer=setTimeout(()=>{activateView(view);$('#transition').classList.remove('show')},1000);
   }else activateView(view);
 }
+function updateSoundControl(){
+  const button=$('#sound-toggle');
+  const isIntro=currentView==='intro';
+  button.querySelector('.icon').textContent=soundEnabled?'volume_up':'volume_off';
+  button.setAttribute('aria-pressed',String(soundEnabled));
+  button.setAttribute('aria-label',soundEnabled?(isIntro?'Mute video audio':'Mute background music'):(isIntro?'Play video audio':'Play background music'));
+  button.title=soundEnabled?(isIntro?'Mute video audio':'Mute background music'):(isIntro?'Play video audio':'Play background music');
+}
+async function syncSoundToView(){
+  const video=$('#intro-video'),music=$('#music');
+  const playVideoAudio=currentView==='intro'&&soundEnabled;
+  video.muted=!playVideoAudio;
+  if(!soundEnabled||playVideoAudio){music.pause();return}
+  try{await music.play()}
+  catch{
+    soundEnabled=false;
+    music.pause();
+    updateSoundControl();
+  }
+}
 function activateView(view){
   currentView=view;document.body.dataset.view=view;
   ['intro','journey','wedding'].forEach(name=>{$('#'+name).hidden=name!==view});
@@ -62,6 +83,8 @@ function activateView(view){
   $$('.nav-track i').forEach((dot,i)=>dot.classList.toggle('active',i<=index));
   if(view==='intro'&&!reducedMotion)$('#intro-video').play().catch(()=>{});
   else $('#intro-video').pause();
+  updateSoundControl();
+  void syncSoundToView();
   if(view==='journey'){resizeCanvases();renderGlobe()}
 }
 $$('[data-view-link]').forEach(button=>button.addEventListener('click',()=>setView(button.dataset.viewLink)));
@@ -84,12 +107,11 @@ $('#theme-toggle').addEventListener('click',()=>{
   renderParticles();renderGlobe();
 });
 $('#sound-toggle').addEventListener('click',async()=>{
-  const music=$('#music');
-  if(music.paused){try{await music.play()}catch{$('#sound-toggle').title='Audio could not play. Try again.';return}}else music.pause();
-  $('#sound-toggle .icon').textContent=music.paused?'volume_off':'volume_up';
-  $('#sound-toggle').setAttribute('aria-pressed',String(!music.paused));
-  $('#sound-toggle').setAttribute('aria-label',music.paused?'Play background music':'Pause background music');
+  soundEnabled=!soundEnabled;
+  updateSoundControl();
+  await syncSoundToView();
 });
+updateSoundControl();
 let progress=0,loaded=false;
 function finishLoading(){
   if(loaded)return;loaded=true;clearInterval(loadInterval);
